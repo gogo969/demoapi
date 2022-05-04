@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fastjson"
-	"reportApi2/contrib/session"
-	"reportApi2/model"
+	"reportapi/contrib/session"
+	"reportapi/model"
 )
 
 var allows = map[string]bool{

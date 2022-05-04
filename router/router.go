@@ -5,7 +5,7 @@ import (
 	"runtime/debug"
 	"time"
 
-	"reportApi2/controller"
+	"reportapi/controller"
 
 	"github.com/buaazp/fasthttprouter"
 	"github.com/valyala/fasthttp"

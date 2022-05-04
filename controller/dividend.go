@@ -3,8 +3,8 @@ package controller
 import (
 	g "github.com/doug-martin/goqu/v9"
 	"github.com/valyala/fasthttp"
-	"reportApi2/contrib/helper"
-	"reportApi2/model"
+	"reportapi/contrib/helper"
+	"reportapi/model"
 )
 
 type DividendController struct{}

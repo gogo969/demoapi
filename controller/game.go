@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/valyala/fasthttp"
-	"reportApi2/contrib/helper"
-	"reportApi2/contrib/validator"
-	"reportApi2/model"
+	"reportapi/contrib/helper"
+	"reportapi/contrib/validator"
+	"reportapi/model"
 )
 
 type GameController struct{}
