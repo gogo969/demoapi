@@ -27,6 +27,30 @@ type Report struct {
 	ProfitRate          string `db:"profit_rate" json:"profit_rate"`
 }
 
+type GameDetailReportData struct {
+	D []DetailReport `json:"d"`
+	T int64          `json:"t"`
+	S int            `json:"s"`
+}
+
+type DetailReport struct {
+	Id               string  `json:"id" db:"id"`
+	ReportTime       int64   `json:"report_time" db:"report_time"`
+	ReportType       int     `json:"report_type" db:"report_type"`
+	ApiType          int64   `json:"api_type" db:"api_type"`
+	GameCode         string  `json:"game_code" db:"game_code"`
+	GameName         string  `json:"game_name" db:"game_name"`
+	GameVnName       string  `json:"game_vn_name" db:"game_vn_name"`
+	Prefix           string  `json:"prefix" db:"prefix"`
+	MemCount         int64   `json:"mem_count" db:"mem_count"`
+	BetAmount        float64 `json:"bet_amount" db:"bet_amount"`
+	ValidBetAmount   float64 `json:"valid_bet_amount" db:"valid_bet_amount"`
+	CompanyNetAmount float64 `json:"company_net_amount" db:"company_net_amount"`
+	RebateAmount     float64 `json:"rebate_amount" db:"rebate_amount"`
+	ProfitAmount     float64 `json:"profit_amount" db:"profit_amount"`
+	ProfitRate       float64 `json:"profit_rate" db:"profit_rate"`
+}
+
 type GameReportData struct {
 	D   []Report `json:"d"`
 	T   int64    `json:"t"`
@@ -60,6 +84,66 @@ func GameReport(ty, flag, dateFlag, timeFlag int, startTime, endTime, gameIds st
 	if dateFlag == ReportDateFlagSettle && ty == ReportTyPlat {
 		result, err := gamePlatReportSettleTime(startAt, endAt, flag, timeFlag, gameIds, page, pagesize)
 		return result, err
+	}
+
+	return result, nil
+}
+
+// GameDetailReport Game 游戏报表
+func GameDetailReport(flag int, startTime, endTime string, gameIds []string, page, pageSize int) (GameDetailReportData, error) {
+
+	var result GameDetailReportData
+
+	startAt := helper.DaySST(startTime, loc).Unix()
+
+	endAt := helper.DaySET(endTime, loc).Unix()
+
+	if startAt > endAt {
+		return result, errors.New(helper.QueryTimeRangeErr)
+	}
+	ex := g.Ex{
+		"report_time": g.Op{"between": exp.NewRangeVal(startAt, endAt)},
+		"api_type":    gameIds,
+		"prefix":      meta.Prefix,
+	}
+	tableName := "tbl_report_game_detail"
+	if flag == ReportFlagDay { // 日报
+		ex["report_type"] = 1
+	}
+
+	if flag == ReportFlagMonth { //
+		ex["report_type"] = 2
+	}
+	offset := (page - 1) * pageSize
+
+	buildCount := dialect.From(tableName).Select(g.COUNT("game_code")).Where(ex)
+	query, _, _ := buildCount.ToSQL()
+	err := meta.ReportDB.Get(&result.T, query)
+	if err != nil {
+		return result, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+	}
+
+	build := dialect.From(tableName).Where(ex)
+
+	build = build.GroupBy("api_type", "game_code").Select(
+		"api_type", "game_code",
+		g.SUM("mem_count").As("mem_count"),
+		g.SUM("bet_amount").As("bet_amount"),
+		g.SUM("valid_bet_amount").As("valid_bet_amount"),
+		g.SUM("company_net_amount").As("company_net_amount"),
+		g.SUM("rebate_amount").As("rebate_amount"),
+		g.SUM("profit_amount").As("profit_amount"),
+		g.SUM("profit_rate").As("profit_rate"),
+	).Order(g.C("report_time").Desc()).Offset(uint(offset)).Limit(uint(pageSize))
+	query, _, _ = build.ToSQL()
+	err = meta.ReportDB.Select(&result.D, query)
+	if err != nil {
+		return result, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+	}
+
+	for _, v := range result.D {
+		v.GameName = gameNameMap[v.ApiType][v.GameCode].CnName
+		v.GameVnName = gameNameMap[v.ApiType][v.GameCode].VnName
 	}
 
 	return result, nil

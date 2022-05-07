@@ -43,3 +43,60 @@ func (that *GameController) List(ctx *fasthttp.RequestCtx) {
 
 	helper.Print(ctx, true, data)
 }
+
+// 游戏分类报表
+func (that *GameController) CpDetail(ctx *fasthttp.RequestCtx) {
+
+	flag := ctx.QueryArgs().GetUintOrZero("flag") //1-日报;2-月报
+	ids := []string{"8840968486572375835", "2326854765648775667"}
+	startDate := string(ctx.QueryArgs().Peek("start_date")) //开始时间
+	endDate := string(ctx.QueryArgs().Peek("end_date"))     //结束时间
+	page := ctx.QueryArgs().GetUintOrZero("page")           //页码
+	pageSize := ctx.QueryArgs().GetUintOrZero("page_size")  //一页多少条
+
+	if page < 1 {
+		helper.Print(ctx, false, model.ParamErr)
+		return
+	}
+
+	if pageSize < 10 || pageSize > 200 {
+		helper.Print(ctx, false, model.ParamErr)
+		return
+	}
+
+	data, err := model.GameDetailReport(flag, startDate, endDate, ids, page, pageSize)
+	if err != nil {
+		helper.Print(ctx, false, err.Error())
+		return
+	}
+
+	helper.Print(ctx, true, data)
+}
+
+func (that *GameController) ZrDetail(ctx *fasthttp.RequestCtx) {
+
+	flag := ctx.QueryArgs().GetUintOrZero("flag") //1-日报;2-月报
+	ids := []string{"2658175169982643138", "2306856765348772637", "1055235995899664907", "75445461569712187", "39636407564188", "36579683428691"}
+	startDate := string(ctx.QueryArgs().Peek("start_date")) //开始时间
+	endDate := string(ctx.QueryArgs().Peek("end_date"))     //结束时间
+	page := ctx.QueryArgs().GetUintOrZero("page")           //页码
+	pageSize := ctx.QueryArgs().GetUintOrZero("page_size")  //一页多少条
+
+	if page < 1 {
+		helper.Print(ctx, false, model.ParamErr)
+		return
+	}
+
+	if pageSize < 10 || pageSize > 200 {
+		helper.Print(ctx, false, model.ParamErr)
+		return
+	}
+
+	data, err := model.GameDetailReport(flag, startDate, endDate, ids, page, pageSize)
+	if err != nil {
+		helper.Print(ctx, false, err.Error())
+		return
+	}
+
+	helper.Print(ctx, true, data)
+}
