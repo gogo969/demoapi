@@ -8,14 +8,13 @@ import (
 	g "github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/mysql"
 	"github.com/fluent/fluent-logger-golang/fluent"
-	"github.com/gertd/go-pluralize"
 	"github.com/go-redis/redis/v8"
 	"github.com/jmoiron/sqlx"
 	"github.com/olivere/elastic/v7"
 	"net/http"
 	"reflect"
-	"reportApi2/contrib/helper"
-	"reportApi2/contrib/tracerr"
+	"reportapi/contrib/helper"
+	"reportapi/contrib/tracerr"
 	"time"
 )
 

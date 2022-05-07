@@ -6,7 +6,7 @@ import (
 	g "github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/shopspring/decimal"
-	"reportApi2/contrib/helper"
+	"reportapi/contrib/helper"
 )
 
 //数据库查出来的
