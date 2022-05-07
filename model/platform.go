@@ -56,6 +56,7 @@ type ComplexReportData struct {
 	DepositCount        string `db:"deposit_count" json:"deposit_count"`               //首存人数
 	FirstDepositAmount  string `db:"first_deposit_amount" json:"first_deposit_amount"` //首存额
 	SecondDepositAmount string `db:"second_deposit_amount" json:"second_deposit_amount"`
+	SecondDepositCount  string `db:"second_deposit_count" json:"second_deposit_count"`
 	DepositMemCount     string `db:"deposit_mem_count" json:"deposit_mem_count"`       //存款人数
 	WithdrawalMemCount  string `db:"withdrawal_mem_count" json:"withdrawal_mem_count"` //取款人数
 	DepositAmount       string `db:"deposit_amount" json:"deposit_amount"`             //存款额
@@ -64,6 +65,7 @@ type ComplexReportData struct {
 	BetAmount           string `db:"bet_amount" json:"bet_amount"`                     //投注额
 	ValidBetAmount      string `db:"valid_bet_amount" json:"valid_bet_amount"`         //有效投注额
 	CompanyNetAmount    string `db:"company_net_amount" json:"company_net_amount"`     //公司输赢
+	Presettle           string `db:"presettle" json:"presettle"`                       //提前结算
 	AdjustAmount        string `db:"adjust_amount" json:"adjust_amount"`               //分数调整
 	DividendAmount      string `db:"dividend_amount" json:"dividend_amount"`           //红利
 	RebateAmount        string `db:"rebate_amount" json:"rebate_amount"`               //返水
@@ -242,7 +244,6 @@ func platformFinanceReportCol() []interface{} {
 		g.SUM("bet_amount").As("bet_amount"),
 		g.SUM("valid_bet_amount").As("valid_bet_amount"),
 		g.SUM("company_net_amount").As("company_net_amount"),
-		g.SUM("profit_amount").As("profit_amount"),
 		g.SUM("adjust_amount").As("adjust_amount"),
 		g.SUM("dividend_amount").As("dividend_amount"),
 		g.SUM("rebate_amount").As("rebate_amount"),
@@ -537,7 +538,7 @@ func ComplexReport(flag int, startDate, endDate string) (ComplexReportData, erro
 	}
 	data := ComplexReportData{}
 	var financeList []DepositsChannel
-	var financeMap map[int]DepositsChannel
+	financeMap := map[int]DepositsChannel{}
 	startAt, err := helper.TimeToLoc(startDate, loc) // 秒级时间戳
 	if err != nil {
 		return data, err
@@ -553,27 +554,21 @@ func ComplexReport(flag int, startDate, endDate string) (ComplexReportData, erro
 	}
 	ex["report_time"] = g.Op{"between": exp.NewRangeVal(startAt, endAt)}
 
-	var t int
-	totalQuery, _, _ := dialect.From("tbl_report_platform").
-		Select(g.COUNT("id")).Where(ex).ToSQL()
-	err = meta.ReportDB.Get(&t, totalQuery)
-	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), "db", helper.DBErr)
-	}
-
 	col := platformFinanceReportCol()
-
 	query, _, _ := dialect.From("tbl_report_platform").Select(col...).Where(ex).ToSQL()
-
+	fmt.Println(query)
 	err = meta.ReportDB.Get(&data, query)
 	if err != nil {
 		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
 	}
+
 	cm, _ := decimal.NewFromString(data.CompanyRevenue)
 	vb, _ := decimal.NewFromString(data.ValidBetAmount)
 	data.WinRate = cm.Div(vb).StringFixed(3)
 
-	query2, _, _ := dialect.From("tbl_report_finance").Select(col...).Where(ex).ToSQL()
+	delete(ex, "report_type")
+	query2, _, _ := dialect.From("tbl_report_finance").Select(g.SUM("deposit_num").As("deposit_num"),
+		g.SUM("deposit_amount").As("deposit_amount"), g.C("channel_id").As("channel_id")).Where(ex).GroupBy("channel_id").ToSQL()
 
 	err = meta.ReportDB.Select(&financeList, query2)
 	if err != nil {
@@ -610,6 +605,7 @@ func ComplexReport(flag int, startDate, endDate string) (ComplexReportData, erro
 
 	data.ManualAmount = fmt.Sprintf(`%f`, financeMap[11].DepositAmount)
 	data.ManualCount = fmt.Sprintf(`%d`, financeMap[11].DepositNum)
+
 	return data, nil
 
 }

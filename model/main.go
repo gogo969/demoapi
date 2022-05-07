@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"reflect"
 	"reportapi/contrib/helper"
+	"reportapi/contrib/tdlog"
 	"reportapi/contrib/tracerr"
 	"time"
 )
@@ -45,7 +46,6 @@ var (
 	loc               *time.Location
 	meta              *MetaTable
 	ctx               = context.Background()
-	pluralizeClient   = pluralize.NewClient()
 	dialect           = g.Dialect("mysql")
 	colReport         = helper.EnumFields(Report{})
 	colRealTimeReport = helper.EnumFields(RealTimeReport{})
@@ -73,21 +73,33 @@ func Constructor(mt *MetaTable) {
 
 func pushLog(err error, flag, code string) error {
 
-	// flag= db | redis | es
-	//pc, fn, line, _ := runtime.Caller(1)
-
 	err = tracerr.Wrap(err)
+	fields := map[string]string{
+		"filename": tracerr.SprintSource(err, 2, 2),
+		"content":  err.Error(),
+		"fn":       code,
+		"id":       helper.GenId(),
+		"project":  "MerchantAdmin",
+	}
 	l := log_t{
 		ID:      helper.GenId(),
-		Project: "reportApi",
-		Flags:   flag,
+		Project: "merchant",
+		Flags:   code,
 		Fn:      "",
 		File:    tracerr.SprintSource(err, 2, 2),
 		Content: err.Error(),
 	}
+	err = tdlog.Info(fields)
+	if err != nil {
+		fmt.Printf("write td[%#v] err : %s", fields, err.Error())
+	}
 
-	_ = meta.Zlog.Post("report_error", l)
+	_ = meta.Zlog.Post(esPrefixIndex("merchant_error"), l)
 	return fmt.Errorf("%s,%s", code, l.ID)
+}
+
+func esPrefixIndex(index string) string {
+	return meta.EsPrefix + index
 }
 
 func pushFlagLog(err error, flag string) error {
