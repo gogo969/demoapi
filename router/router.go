@@ -83,6 +83,8 @@ func SetupRouter(b BuildInfo) *fasthttprouter.Router {
 	get("/merchant/report/member", memberCtl.List)
 	// 报表中心-红利报表
 	get("/merchant/report/dividend", dividendCtl.List)
+	// 报表中心-综合报表
+	get("/merchant/report/overview", platformCtl.Overview)
 	return router
 }
 

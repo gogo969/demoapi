@@ -38,6 +38,8 @@ type MemberReportItem struct {
 	ConversionRate        string `json:"conversion_rate" db:"conversion_rate"`
 	FirstDepositCount     string `json:"first_deposit_count" db:"first_deposit_count"`
 	FirstDepositAmount    string `json:"first_deposit_amount" db:"first_deposit_amount"`
+	SecondDepositCount    string `json:"second_deposit_count" db:"second_deposit_count"`
+	SecondDepositAmount   string `json:"second_deposit_amount" db:"second_deposit_amount"`
 	AvgFirstDepositAmount string `json:"avg_first_deposit_amount" db:"avg_first_deposit_amount"`
 	DepositMemCount       string `json:"deposit_mem_count" db:"deposit_mem_count"`
 	WithdrawalMemCount    string `json:"withdrawal_mem_count" db:"withdrawal_mem_count"`
@@ -94,6 +96,8 @@ type MemberData struct {
 	ConversionRate        string `json:"conversion_rate" db:"conversion_rate"`
 	FirstDepositCount     string `json:"first_deposit_count" db:"first_deposit_count"`
 	FirstDepositAmount    string `json:"first_deposit_amount" db:"first_deposit_amount"`
+	SecondDepositCount    string `json:"second_deposit_count" db:"second_deposit_count"`
+	SecondDepositAmount   string `json:"second_deposit_amount" db:"second_deposit_amount"`
 	AvgFirstDepositAmount string `json:"avg_first_deposit_amount" db:"avg_first_deposit_amount"`
 	DepositMemCount       string `json:"deposit_mem_count" db:"deposit_mem_count"`
 	WithdrawalMemCount    string `json:"withdrawal_mem_count" db:"withdrawal_mem_count"`
@@ -239,16 +243,17 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 		ex["username"] = userName
 	}
 
+	if ty == 1 {
+		ex["data_type"] = 2
+	} else if userName != "" {
+		ex["data_type"] = 1
+	}
+
 	if page == 1 {
 		if timeFlag != ReportTimeFlagSingle {
 			var t []User
 			totalQuery, _, _ := dialect.From("tbl_report_agency").Select(g.C("uid").As("uid"),
 				g.V("0").As("report_time")).Where(ex).GroupBy("uid").ToSQL()
-			if ty == 1 {
-				totalQuery = strings.ReplaceAll(totalQuery, "WHERE", "WHERE uid=parent_uid and ")
-			} else if userName != "" {
-				totalQuery = strings.ReplaceAll(totalQuery, "WHERE", "WHERE uid!=parent_uid and ")
-			}
 			fmt.Println(totalQuery)
 			err := meta.ReportDB.Select(&t, totalQuery)
 			if err != nil {
@@ -262,11 +267,6 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			var t []User
 			totalQuery, _, _ := dialect.From("tbl_report_agency").Select(g.C("uid").As("uid"),
 				g.C("report_time").As("report_time")).Where(ex).ToSQL()
-			if ty == 1 {
-				totalQuery = strings.ReplaceAll(totalQuery, "WHERE", "WHERE uid=parent_uid and ")
-			} else if userName != "" {
-				totalQuery = strings.ReplaceAll(totalQuery, "WHERE", "WHERE uid!=parent_uid and ")
-			}
 			fmt.Println(totalQuery)
 			err := meta.ReportDB.Select(&t, totalQuery)
 			if err != nil {
@@ -289,6 +289,8 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			g.SUM("conversion_rate").As("conversion_rate"),
 			g.SUM("first_deposit_count").As("first_deposit_count"),
 			g.SUM("first_deposit_amount").As("first_deposit_amount"),
+			g.SUM("second_deposit_count").As("second_deposit_count"),
+			g.SUM("second_deposit_amount").As("second_deposit_amount"),
 			g.SUM("avg_first_deposit_amount").As("avg_first_deposit_amount"),
 			g.SUM("deposit_mem_count").As("deposit_mem_count"),
 			g.SUM("withdrawal_mem_count").As("withdrawal_mem_count"),
@@ -309,11 +311,6 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			g.SUM("company_revenue").As("company_revenue"),
 			g.SUM("deposit_count").As("deposit_count")).Where(ex).ToSQL()
 		err := meta.ReportDB.Get(&data.Agg, aggQuery)
-		if ty == 1 {
-			aggQuery = strings.ReplaceAll(aggQuery, "WHERE", "WHERE uid=parent_uid and ")
-		} else if userName != "" {
-			aggQuery = strings.ReplaceAll(aggQuery, "WHERE", "WHERE uid!=parent_uid and ")
-		}
 		if err != nil {
 			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), aggQuery), "db", helper.DBErr)
 		}
@@ -359,6 +356,8 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 		g.SUM("conversion_rate").As("conversion_rate"),
 		g.SUM("first_deposit_count").As("first_deposit_count"),
 		g.SUM("first_deposit_amount").As("first_deposit_amount"),
+		g.SUM("second_deposit_count").As("second_deposit_count"),
+		g.SUM("second_deposit_amount").As("second_deposit_amount"),
 		g.SUM("avg_first_deposit_amount").As("avg_first_deposit_amount"),
 		g.SUM("deposit_mem_count").As("deposit_mem_count"),
 		g.SUM("withdrawal_mem_count").As("withdrawal_mem_count"),
@@ -381,10 +380,7 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 	).GroupBy("uid", "username", "prefix", "parent_uid", "parent_name", "commissions_id", "commission_name", "report_time").Offset(uint(offset)).Limit(uint(pageSize))
 	query, _, _ := build.ToSQL()
 	if ty == 1 {
-		query = strings.ReplaceAll(query, "WHERE", "WHERE uid=parent_uid and ")
 		query = strings.ReplaceAll(query, ", `report_time`", "")
-	} else if userName != "" {
-		query = strings.ReplaceAll(query, "WHERE", "WHERE uid!=parent_uid and ")
 	}
 	fmt.Println(query)
 	err := meta.ReportDB.Select(&list, query)
@@ -414,6 +410,8 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			ConversionRate:        v.ConversionRate,
 			FirstDepositCount:     v.FirstDepositCount,
 			FirstDepositAmount:    v.FirstDepositAmount,
+			SecondDepositCount:    v.SecondDepositCount,
+			SecondDepositAmount:   v.SecondDepositAmount,
 			AvgFirstDepositAmount: v.AvgFirstDepositAmount,
 			DepositMemCount:       v.DepositMemCount,
 			WithdrawalMemCount:    v.WithdrawalMemCount,
