@@ -34,14 +34,10 @@ type GameDetailReportData struct {
 }
 
 type DetailReport struct {
-	Id               string  `json:"id" db:"id"`
-	ReportTime       int64   `json:"report_time" db:"report_time"`
-	ReportType       int     `json:"report_type" db:"report_type"`
 	ApiType          int64   `json:"api_type" db:"api_type"`
 	GameCode         string  `json:"game_code" db:"game_code"`
 	GameName         string  `json:"game_name" db:"game_name"`
 	GameVnName       string  `json:"game_vn_name" db:"game_vn_name"`
-	Prefix           string  `json:"prefix" db:"prefix"`
 	MemCount         int64   `json:"mem_count" db:"mem_count"`
 	BetAmount        float64 `json:"bet_amount" db:"bet_amount"`
 	ValidBetAmount   float64 `json:"valid_bet_amount" db:"valid_bet_amount"`
@@ -140,10 +136,17 @@ func GameDetailReport(flag int, startTime, endTime string, gameIds []string, pag
 	if err != nil {
 		return result, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
 	}
+	l := len(result.D)
+	for i := 0; i < l; i++ {
 
-	for _, v := range result.D {
+		v := result.D[i]
 		v.GameName = gameNameMap[v.ApiType][v.GameCode].CnName
 		v.GameVnName = gameNameMap[v.ApiType][v.GameCode].VnName
+		v.ProfitAmount, _ = decimal.NewFromFloat(v.CompanyNetAmount).Sub(decimal.NewFromFloat(v.RebateAmount)).Float64()
+		if decimal.NewFromFloat(v.ValidBetAmount).Cmp(decimal.Zero) != 0 {
+			v.ProfitRate, _ = decimal.NewFromFloat(v.ProfitAmount).Div(decimal.NewFromFloat(v.ValidBetAmount)).Float64()
+		}
+		result.D[i] = v
 	}
 
 	return result, nil
