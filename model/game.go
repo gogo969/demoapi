@@ -86,7 +86,7 @@ func GameReport(ty, flag, dateFlag, timeFlag int, startTime, endTime, gameIds st
 	return result, nil
 }
 
-// GameDetailReport Game 游戏报表
+// GameDetailReport 游戏子游戏报表
 func GameDetailReport(flag int, startTime, endTime string, gameIds []string, page, pageSize int) (GameDetailReportData, error) {
 
 	var result GameDetailReportData
