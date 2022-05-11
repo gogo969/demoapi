@@ -34,7 +34,8 @@ type GameDetailReportData struct {
 }
 
 type DetailReport struct {
-	ApiType          int64   `json:"api_type" db:"api_type"`
+	ApiType          string  `json:"api_type" db:"api_type"`
+	ApiName          string  `json:"api_name" db:"api_name"`
 	GameCode         string  `json:"game_code" db:"game_code"`
 	GameName         string  `json:"game_name" db:"game_name"`
 	GameVnName       string  `json:"game_vn_name" db:"game_vn_name"`
@@ -142,6 +143,12 @@ func GameDetailReport(flag int, startTime, endTime string, gameIds []string, pag
 		v := result.D[i]
 		v.GameName = gameNameMap[v.ApiType][v.GameCode].CnName
 		v.GameVnName = gameNameMap[v.ApiType][v.GameCode].VnName
+		if v.ApiType == "8840968486572375835" {
+			v.ApiName = "P3_CP"
+		}
+		if v.ApiType == "2326854765648775667" {
+			v.ApiName = "AE_CP"
+		}
 		v.ProfitAmount, _ = decimal.NewFromFloat(v.CompanyNetAmount).Sub(decimal.NewFromFloat(v.RebateAmount)).Float64()
 		if decimal.NewFromFloat(v.ValidBetAmount).Cmp(decimal.Zero) != 0 {
 			v.ProfitRate, _ = decimal.NewFromFloat(v.ProfitAmount).Div(decimal.NewFromFloat(v.ValidBetAmount)).Float64()

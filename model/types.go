@@ -59,8 +59,8 @@ type gameName struct {
 	VnName string
 }
 
-var gameNameMap = map[int64]map[string]gameName{
-	8840968486572375835: {
+var gameNameMap = map[string]map[string]gameName{
+	"8840968486572375835": {
 
 		"1": {VnName: "Hà Nội",
 			CnName: "河内"},
@@ -223,5 +223,234 @@ var gameNameMap = map[int64]map[string]gameName{
 
 		"58": {VnName: "Đà Nẵng 5 phút",
 			CnName: "岘港5分彩"},
+	},
+	"2326854765648775667": {
+		"AHK3": {
+			CnName: "安徽快3",
+			VnName: "An Huy nhanh 3"},
+		"JLK3": {
+			CnName: "吉林快3",
+			VnName: "Cát Lâm nhanh 3",
+		}, "JSK3": {
+			CnName: "江苏快3",
+			VnName: "Giang Tô nhanh 3",
+		}, "HBK3": {
+			CnName: "湖北快3",
+			VnName: "Hồ Bắc nhanh 3",
+		}, "NYK35F": {
+			CnName: "新3D快三",
+			VnName: "Mới 3D nhanh 3",
+		}, "NYK35F2": {
+			CnName: "澳门快三",
+			VnName: "Ma Cao nhanh 3",
+		}, "NYK35F3": {
+			CnName: "凤凰快三",
+			VnName: "Phoenix nhanh 3",
+		}, "NYK35F4": {
+			CnName: "新加坡快三5分",
+			VnName: "Singapore 5 phút",
+		}, "NYK35F5": {
+			CnName: "香港快三",
+			VnName: "Hồng Kông nhanh 3",
+		}, "NYK32F": {
+			CnName: "澳门快三2分",
+			VnName: "Ma Cao 2 phút",
+		}, "NYK310F": {
+			CnName: "新加坡快三",
+			VnName: "Singapore nhanh 3",
+		}, "NYK310F2": {
+			CnName: "台湾风彩",
+			VnName: "Đài Loan nhanh 3",
+		}, "NYK31F": {
+			CnName: "极速骰宝",
+			VnName: "Tốc độ sicbo",
+		}, "NYK33F": {
+			CnName: "幸运骰宝",
+			VnName: "may mắn sicbo",
+		}, "TXFFC": {
+			CnName: "騰訊分分彩",
+			VnName: "Tencent SSC",
+		}, "TX3FC": {
+			CnName: "騰訊三分彩",
+			VnName: "Tencent SSC 3 phút",
+		}, "TX5FC": {
+			CnName: "騰訊五分彩",
+			VnName: "Tencent SSC 5 phút",
+		}, "TX10FC": {
+			CnName: "騰訊十分彩",
+			VnName: "Tencent SSC 10min",
+		}, "TW5FC": {
+			CnName: "台灣五分彩",
+			VnName: "Taiwan SSC",
+		}, "HNFFC": {
+			CnName: "河內分分彩",
+			VnName: "Hanoi Quick1",
+		}, "HN5FC": {
+			CnName: "河內五分彩",
+			VnName: "Hanoi Quick5",
+		}, "AZXY5": {
+			CnName: "澳洲幸運5",
+			VnName: "Lucky 5 Ball",
+		}, "NYSSC30S": {
+			CnName: "浙江30秒",
+			VnName: "Zhejiang SSC 30s",
+		}, "NYSSC1F": {
+			CnName: "新腾讯分分彩",
+			VnName: "New Tencent SSC",
+		}, "NYSSC15F": {
+			CnName: "上海1.5分彩",
+			VnName: "Shanghai SSC 90s",
+		}, "NYSSC3F": {
+			CnName: "重庆3分彩",
+			VnName: "Chongqing SSC 3min",
+		}, "NYSSC3F2": {
+			CnName: "幸运3分彩",
+			VnName: "Lucky SSC",
+		}, "NYSSC3F3": {
+			CnName: "3分时时彩",
+			VnName: "AE SSC 3min",
+		}, "NYSSC5F": {
+			CnName: "广东5分彩",
+			VnName: "Guangdong SSC 5min",
+		}, "NYSSC5F2": {
+			CnName: "江西5分彩",
+			VnName: "Jiangxi SSC 5min",
+		}, "NYSSC5F3": {
+			CnName: "重庆5分彩",
+			VnName: "Chongqing SSC 5min",
+		}, "NYSSC5F4": {
+			CnName: "5分时时彩",
+			VnName: "AE SSC 5min",
+		}, "NYSSC10F": {
+			CnName: "十分时时彩",
+			VnName: "AE SSC 10min",
+		}, "BJPK10": {
+			CnName: "北京賽車",
+			VnName: "Beijing PK10",
+		}, "XYFT": {
+			CnName: "幸運飛艇",
+			VnName: "Lucky Airship",
+		}, "AZXY10": {
+			CnName: "澳洲幸運10",
+			VnName: "Lucky 10 Ball",
+		}, "NYSC30S": {
+			CnName: "空战风云",
+			VnName: "Air Wars",
+		}, "NYSC1F": {
+			CnName: "空战风云60秒",
+			VnName: "Air Wars 60s",
+		}, "NYSC75S": {
+			CnName: "极速赛车",
+			VnName: "Speed PK10",
+		}, "NYSC15F": {
+			CnName: "竞速1.5分",
+			VnName: "Fast PK10",
+		}, "NYSC3F": {
+			CnName: "竞速3分",
+			VnName: "Quick PK10",
+		}, "NYSC5F": {
+			CnName: "墨西哥摩托",
+			VnName: "Mexico PK10",
+		}, "NYSC5F2": {
+			CnName: "澳门PK10",
+			VnName: "Macao PK10",
+		}, "NYSC5F3": {
+			CnName: "香港赛车",
+			VnName: "Hong Kong PK10",
+		}, "SDSYXW": {
+			CnName: "山東11選5",
+			VnName: "Shandong 11x5",
+		}, "JXSYXW": {
+			CnName: "江西11選5",
+			VnName: "Jiangxi 11x5",
+		}, "GDSYXW": {
+			CnName: "廣東11選5",
+			VnName: "Guangdong 11x5",
+		}, "JSSYXW": {
+			CnName: "江苏11选5",
+			VnName: "Jiangsu 11x5",
+		}, "SHSYXW": {
+			CnName: "上海11选5",
+			VnName: "Shanghai 11x5",
+		}, "BJ28": {
+			CnName: "北京28",
+			VnName: "Beijing 28",
+		}, "XGLHC": {
+			CnName: "香港六合彩",
+			VnName: "HG MarkSix",
+		}, "NYLHC75S": {
+			CnName: "極速六合彩",
+			VnName: "Speed MarkSix",
+		}, "NYLHC3F": {
+			CnName: "3分六合彩",
+			VnName: "MarkSix 3min",
+		}, "NYLHC5F": {
+			CnName: "5分六合彩",
+			VnName: "MarkSix 5min",
+		}, "THAI": {
+			CnName: "泰国官彩",
+			VnName: "Thai Gov. Lottery",
+		}, "NYTHAIFFC": {
+			CnName: "泰国快乐彩",
+			VnName: "Thai Happy Lottery",
+		}, "NYTHAI3FC": {
+			CnName: "泰国金币彩",
+			VnName: "Thai Money Lottery",
+		}, "NYTHAI5FC": {
+			CnName: "泰国幸运彩",
+			VnName: "Thai Lucky Lottery",
+		}, "NYTHAI10FC": {
+			CnName: "泰国闪耀彩",
+			VnName: "Thai Shiny Lottery",
+		}, "LAODL": {
+			CnName: "老挝彩",
+			VnName: "LAO Gov. Lottery",
+		}, "MAGNUM4D": {
+			CnName: "Malaysia Magnum 4D",
+			VnName: "4D",
+		}, "DAMA4D": {
+			CnName: "大马彩4D",
+			VnName: "Malaysia DaMaCai 4D",
+		}, "SIG4D": {
+			CnName: "新加坡4D",
+			VnName: "Singapore 4D",
+		}, "YEEKEE": {
+			CnName: "YeeKee",
+			VnName: "YeeKee YeeKee",
+		}, "SUPERYK": {
+			CnName: "Super",
+			VnName: "Happy YeeKee",
+		}, "HAPPYYK": {
+			CnName: "Happy",
+			VnName: "Happy YeeKee",
+		}, "THAISETL": {
+			CnName: "泰國SET綜合指數",
+			VnName: "Thai stock market Noon",
+		}, "THAISETN": {
+			CnName: "泰國SET綜合指數",
+			VnName: "Thai stock market Evening",
+		}, "JPNIKL": {
+			CnName: "日經225指數",
+			VnName: "Nikkei 225 Morning",
+		}, "JPNIKN": {
+			CnName: "日經225指數",
+			VnName: "Nikkei 225 Noon",
+		}, "HKHSIL": {
+			CnName: "香港恆生指數",
+			VnName: "Hang Seng Index Morning",
+		}, "HKHSIN": {
+			CnName: "香港恆生指數",
+			VnName: "Hang Seng Index Noon",
+		}, "SZSECIL": {
+			CnName: "深证成指",
+			VnName: "Chinese stocks Morning",
+		}, "SZSECIN": {
+			CnName: "深证成指",
+			VnName: "Chinese stocks Noon",
+		},
+		"NYYK1F": {
+			CnName: "YeeKee",
+			VnName: "YeeKee Lotto",
+		},
 	},
 }
