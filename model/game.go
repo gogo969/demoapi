@@ -518,7 +518,7 @@ func GamePlanReport(id string, page, pageSize int) (PlanReportData, error) {
 	if l > 0 {
 		var ids []int64
 		for _, v := range result.D {
-			ids = append(ids, v.PlanId)
+			ids = append(ids, v.Id)
 		}
 
 		var gpb []GamePlanBase
@@ -547,10 +547,10 @@ func GamePlanReport(id string, page, pageSize int) (PlanReportData, error) {
 		}
 
 		for i := 0; i < len(result.D); i++ {
-			result.D[i].BetMemCount = gpbMap[result.D[i].PlanId].BetMemCount
-			result.D[i].BetAmountTotal = gpbMap[result.D[i].PlanId].BetAmountTotal
-			result.D[i].BonusTotal, _ = decimal.NewFromFloat(gpbMap[result.D[i].PlanId].BonusTotal).Sub(
-				decimal.NewFromFloat(gpbMap[result.D[i].PlanId].BetAmountTotal)).Float64()
+			result.D[i].BetMemCount = gpbMap[result.D[i].Id].BetMemCount
+			result.D[i].BetAmountTotal = gpbMap[result.D[i].Id].BetAmountTotal
+			result.D[i].BonusTotal, _ = decimal.NewFromFloat(gpbMap[result.D[i].Id].BonusTotal).Sub(
+				decimal.NewFromFloat(gpbMap[result.D[i].Id].BetAmountTotal)).Float64()
 		}
 	}
 
