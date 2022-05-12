@@ -564,7 +564,9 @@ func ComplexReport(flag int, startDate, endDate string) (ComplexReportData, erro
 
 	cm, _ := decimal.NewFromString(data.CompanyRevenue)
 	vb, _ := decimal.NewFromString(data.ValidBetAmount)
-	data.WinRate = cm.Div(vb).StringFixed(3)
+	if vb.GreaterThanOrEqual(decimal.Zero) {
+		data.WinRate = cm.Div(vb).StringFixed(3)
+	}
 
 	delete(ex, "report_type")
 	query2, _, _ := dialect.From("tbl_report_finance").Select(g.SUM("deposit_num").As("deposit_num"),

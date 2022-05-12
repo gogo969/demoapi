@@ -100,3 +100,30 @@ func (that *GameController) ZrDetail(ctx *fasthttp.RequestCtx) {
 
 	helper.Print(ctx, true, data)
 }
+
+func (that *GameController) Plan(ctx *fasthttp.RequestCtx) {
+
+	id := string(ctx.QueryArgs().Peek("id")) //主计划id
+	//lottId := string(ctx.QueryArgs().Peek("lott_id"))      //lott_id
+	//playId := string(ctx.QueryArgs().Peek("play_id"))      //play_id
+	page := ctx.QueryArgs().GetUintOrZero("page")          //页码
+	pageSize := ctx.QueryArgs().GetUintOrZero("page_size") //一页多少条
+
+	if page < 1 {
+		helper.Print(ctx, false, model.ParamErr)
+		return
+	}
+
+	if pageSize < 10 || pageSize > 200 {
+		helper.Print(ctx, false, model.ParamErr)
+		return
+	}
+
+	data, err := model.GamePlanReport(id, page, pageSize)
+	if err != nil {
+		helper.Print(ctx, false, err.Error())
+		return
+	}
+
+	helper.Print(ctx, true, data)
+}

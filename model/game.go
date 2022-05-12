@@ -8,6 +8,7 @@ import (
 	"github.com/shopspring/decimal"
 	"reportapi/contrib/helper"
 	"strings"
+	"time"
 )
 
 // 投注时间/结算时间 数据结构
@@ -46,6 +47,29 @@ type DetailReport struct {
 	RebateAmount     float64 `json:"rebate_amount" db:"rebate_amount"`
 	ProfitAmount     float64 `json:"profit_amount" db:"profit_amount"`
 	ProfitRate       float64 `json:"profit_rate" db:"profit_rate"`
+}
+
+type PlanIssues struct {
+	Id             int64   `json:"id" db:"id"`
+	PlanId         int64   `json:"plan_id" db:"plan_id"`
+	Issue          string  `json:"issue" db:"issue"`
+	Content        string  `json:"content" db:"content"`
+	BetMemCount    int     `json:"bet_mem_count" db:"bet_mem_count"`
+	BetAmountTotal float64 `json:"bet_amount_total" db:"bet_amount_total"`
+	BonusTotal     float64 `json:"bonus_total" db:"bonus_total"`
+}
+
+type GamePlanBase struct {
+	PlanId         int64   `json:"plan_id" db:"plan_id"`
+	BetMemCount    int     `json:"bet_mem_count" db:"bet_mem_count"`
+	BetAmountTotal float64 `json:"bet_amount_total" db:"bet_amount_total"`
+	BonusTotal     float64 `json:"bonus_total" db:"bonus_total"`
+}
+
+type PlanReportData struct {
+	D []PlanIssues `json:"d"`
+	T int64        `json:"t"`
+	S int          `json:"s"`
 }
 
 type GameReportData struct {
@@ -454,4 +478,81 @@ func reportGameFormat(data []Report) []Report {
 	}
 
 	return data
+}
+
+// GamePlanReport 游戏计划报表
+func GamePlanReport(id string, page, pageSize int) (PlanReportData, error) {
+
+	var result PlanReportData
+
+	ex := g.Ex{
+		"plan_id": id,
+		//"lott_id": lottId,
+		//"play_id": playId,
+		//"prefix":  meta.Prefix,
+		"created_at": g.Op{"between": exp.NewRangeVal(0, time.Now().Unix())},
+	}
+	tableName := "tbl_vncp_plan_issues"
+
+	offset := (page - 1) * pageSize
+
+	buildCount := dialect.From(tableName).Select(g.COUNT("id")).Where(ex)
+	query, _, _ := buildCount.ToSQL()
+	err := meta.SlaveDB.Get(&result.T, query)
+	fmt.Println(query)
+	if err != nil {
+		return result, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+	}
+
+	build := dialect.From(tableName).Where(ex)
+
+	build = build.Select(
+		"id", "plan_id", "issue", "content",
+	).Order(g.C("created_at").Desc()).Offset(uint(offset)).Limit(uint(pageSize))
+	query, _, _ = build.ToSQL()
+	err = meta.SlaveDB.Select(&result.D, query)
+	if err != nil {
+		return result, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+	}
+	l := len(result.D)
+	if l > 0 {
+		var ids []int64
+		for _, v := range result.D {
+			ids = append(ids, v.PlanId)
+		}
+
+		var gpb []GamePlanBase
+		gpbMap := map[int64]GamePlanBase{}
+		exRp := g.Ex{
+			"plan_id": ids,
+			"prefix":  meta.Prefix,
+		}
+
+		build = dialect.From("tbl_report_game_plan").Where(exRp).Select(
+			"plan_id",
+			"bet_mem_count",
+			"bet_amount_total",
+			"bonus_total",
+		)
+		query, _, _ = build.ToSQL()
+		err = meta.ReportDB.Select(&gpb, query)
+		if err != nil {
+			return result, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		}
+
+		if len(gpb) > 0 {
+			for _, v := range gpb {
+				gpbMap[v.PlanId] = v
+			}
+		}
+
+		for i := 0; i < len(result.D); i++ {
+			result.D[i].BetMemCount = gpbMap[result.D[i].PlanId].BetMemCount
+			result.D[i].BetAmountTotal = gpbMap[result.D[i].PlanId].BetAmountTotal
+			result.D[i].BonusTotal, _ = decimal.NewFromFloat(gpbMap[result.D[i].PlanId].BonusTotal).Sub(
+				decimal.NewFromFloat(gpbMap[result.D[i].PlanId].BetAmountTotal)).Float64()
+		}
+	}
+
+	return result, nil
 }
