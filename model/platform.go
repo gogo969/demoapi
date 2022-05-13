@@ -10,37 +10,43 @@ import (
 )
 
 type PlatReportItem struct {
-	ReportTime            string  `db:"report_time" json:"report_time"`                   //投注日期 yyyy-MM-dd 00:00:00的时间戳
-	RegistCount           string  `db:"regist_count" json:"regist_count"`                 //注册人数
-	DepositCount          string  `db:"deposit_count" json:"deposit_count"`               //首存人数
-	ActiveCount           string  `db:"active_count" json:"active_count"`                 //活跃人数
-	ConversionRate        string  `db:"conversion_rate" json:"conversion_rate"`           //转化率
-	FirstDepositAmount    string  `db:"first_deposit_amount" json:"first_deposit_amount"` //首存额
-	SecondDepositAmount   float64 `json:"second_deposit_amount" db:"second_deposit_amount"`
-	AvgFirstDepositAmount string  `db:"avg_first_deposit_amount" json:"avg_first_deposit_amount"` //人均首存
-	DepositMemCount       string  `db:"deposit_mem_count" json:"deposit_mem_count"`               //存款人数
-	WithdrawalMemCount    string  `db:"withdrawal_mem_count" json:"withdrawal_mem_count"`         //取款人数
-	DepositAmount         string  `db:"deposit_amount" json:"deposit_amount"`                     //存款额
-	WithdrawalAmount      string  `db:"withdrawal_amount" json:"withdrawal_amount"`               //取款额
-	DepositWithdrawalSub  string  `db:"deposit_withdrawal_sub" json:"deposit_withdrawal_sub"`     //存取差
-	DepositWithdrawalRate string  `db:"deposit_withdrawal_rate" json:"deposit_withdrawal_rate"`   //提存率
-	BetMemCount           string  `db:"bet_mem_count" json:"bet_mem_count"`                       //投注人數
-	IpCount               string  `db:"ip_count" json:"ip_count"`                                 //投注人數
-	DeviceCount           string  `db:"device_count" json:"device_count"`                         //投注人數
-	BetAmount             string  `db:"bet_amount" json:"bet_amount"`                             //投注额
-	ValidBetAmount        string  `db:"valid_bet_amount" json:"valid_bet_amount"`                 //有效投注额
-	CompanyNetAmount      string  `db:"company_net_amount" json:"company_net_amount"`             //公司输赢
-	ProfitAmount          string  `db:"profit_amount" json:"profit_amount"`                       //盈余比例
-	AdjustAmount          string  `db:"adjust_amount" json:"adjust_amount"`                       //分数调整
-	DividendAmount        string  `db:"dividend_amount" json:"dividend_amount"`                   //红利
-	RebateAmount          string  `db:"rebate_amount" json:"rebate_amount"`                       //返水
-	AgentAmount           string  `db:"agent_amount" json:"agent_amount"`                         //代理佣金
-	Presettle             string  `db:"presettle" json:"presettle"`                               //提前结算
-	CompanyRevenue        string  `db:"company_revenue" json:"company_revenue"`                   //公司收入
-	EfficientActiveCount  string  `db:"efficient_active_count" json:"efficient_active_count"`     //有效日活
-	FirstDepositCount     string  `db:"first_deposit_count" json:"first_deposit_count"`           //首存人数
-	SecondDepositCount    int64   `json:"second_deposit_count" db:"second_deposit_count"`
-	AvgCompanyNetAmount   string  `db:"avg_company_net_amount" json:"avg_company_net_amount"` //公司平均输赢
+	ReportTime                 string  `db:"report_time" json:"report_time"`                   //投注日期 yyyy-MM-dd 00:00:00的时间戳
+	RegistCount                string  `db:"regist_count" json:"regist_count"`                 //注册人数
+	DepositCount               string  `db:"deposit_count" json:"deposit_count"`               //首存人数
+	ActiveCount                string  `db:"active_count" json:"active_count"`                 //活跃人数
+	ConversionRate             string  `db:"conversion_rate" json:"conversion_rate"`           //转化率
+	FirstDepositAmount         string  `db:"first_deposit_amount" json:"first_deposit_amount"` //首存额
+	SecondDepositAmount        float64 `json:"second_deposit_amount" db:"second_deposit_amount"`
+	AvgFirstDepositAmount      string  `db:"avg_first_deposit_amount" json:"avg_first_deposit_amount"` //人均首存
+	DepositMemCount            string  `db:"deposit_mem_count" json:"deposit_mem_count"`               //存款人数
+	WithdrawalMemCount         string  `db:"withdrawal_mem_count" json:"withdrawal_mem_count"`         //取款人数
+	DepositAmount              string  `db:"deposit_amount" json:"deposit_amount"`                     //存款额
+	WithdrawalAmount           string  `db:"withdrawal_amount" json:"withdrawal_amount"`               //取款额
+	DepositWithdrawalSub       string  `db:"deposit_withdrawal_sub" json:"deposit_withdrawal_sub"`     //存取差
+	DepositWithdrawalRate      string  `db:"deposit_withdrawal_rate" json:"deposit_withdrawal_rate"`   //提存率
+	BetMemCount                string  `db:"bet_mem_count" json:"bet_mem_count"`                       //投注人數
+	IpCount                    string  `db:"ip_count" json:"ip_count"`                                 //投注人數
+	DeviceCount                string  `db:"device_count" json:"device_count"`                         //投注人數
+	BetAmount                  string  `db:"bet_amount" json:"bet_amount"`                             //投注额
+	ValidBetAmount             string  `db:"valid_bet_amount" json:"valid_bet_amount"`                 //有效投注额
+	CompanyNetAmount           string  `db:"company_net_amount" json:"company_net_amount"`             //公司输赢
+	ProfitAmount               string  `db:"profit_amount" json:"profit_amount"`                       //盈余比例
+	AdjustAmount               string  `db:"adjust_amount" json:"adjust_amount"`                       //分数调整
+	DividendAmount             string  `db:"dividend_amount" json:"dividend_amount"`                   //红利
+	RebateAmount               string  `db:"rebate_amount" json:"rebate_amount"`                       //返水
+	AgentAmount                string  `db:"agent_amount" json:"agent_amount"`                         //代理佣金
+	Presettle                  string  `db:"presettle" json:"presettle"`                               //提前结算
+	CompanyRevenue             string  `db:"company_revenue" json:"company_revenue"`                   //公司收入
+	EfficientActiveCount       string  `db:"efficient_active_count" json:"efficient_active_count"`     //有效日活
+	FirstDepositCount          string  `db:"first_deposit_count" json:"first_deposit_count"`           //首存人数
+	SecondDepositCount         string  `json:"second_deposit_count" db:"second_deposit_count"`
+	AvgCompanyNetAmount        string  `db:"avg_company_net_amount" json:"avg_company_net_amount"`               //公司平均输赢
+	ReturnRate                 string  `json:"return_rate" db:"return_rate"`                                     //回存率
+	OneTimeUser                string  `json:"one_time_user" db:"one_time_user"`                                 //一次性用户
+	OneTimeShare               string  `json:"one_time_share" db:"one_time_share"`                               //一次性占比
+	FirstDepositConversionRate string  `json:"first_deposit_conversion_rate" db:"first_deposit_conversion_rate"` //首存转化率
+	KillRate                   string  `json:"kill_rate" db:"kill_rate"`                                         //杀率
+	Multiple                   string  `json:"multiple" db:"multiple"`                                           //倍数
 }
 
 type PlatformReportData struct {
@@ -445,21 +451,31 @@ func reportPlatItemFormat(data PlatReportItem) PlatReportItem {
 	rate := decimal.NewFromInt(100)
 
 	firstDepositCount, _ := decimal.NewFromString(data.FirstDepositCount)
+	depositCount, _ := decimal.NewFromString(data.DepositCount)
 	registCount, _ := decimal.NewFromString(data.RegistCount)
 	if !registCount.Equal(min) {
-		val := firstDepositCount.Div(registCount)
+		val := depositCount.Div(registCount)
 		val = val.Mul(rate)
 		data.ConversionRate = val.StringFixed(4)
+		data.FirstDepositConversionRate = firstDepositCount.Div(registCount).Mul(rate).StringFixed(4)
 	} else {
 		data.ConversionRate = "0.0000"
+		data.FirstDepositConversionRate = "0.0000"
 	}
 
 	firstDepositAmount, _ := decimal.NewFromString(data.FirstDepositAmount)
+	secondDepositCount, _ := decimal.NewFromString(data.SecondDepositCount)
+	data.OneTimeUser = firstDepositCount.Sub(secondDepositCount).StringFixed(4)
+
 	if !firstDepositCount.Equal(min) {
 		val := firstDepositAmount.Div(firstDepositCount)
 		data.AvgFirstDepositAmount = val.StringFixed(4)
+		data.ReturnRate = secondDepositCount.Div(firstDepositCount).Mul(rate).StringFixed(4)
+		data.OneTimeShare = (firstDepositCount.Sub(secondDepositCount)).Div(firstDepositCount).StringFixed(4)
 	} else {
 		data.AvgFirstDepositAmount = "0.0000"
+		data.ReturnRate = "0.000"
+		data.OneTimeShare = "0.000"
 	}
 
 	depositAmount, _ := decimal.NewFromString(data.DepositAmount)
@@ -469,8 +485,11 @@ func reportPlatItemFormat(data PlatReportItem) PlatReportItem {
 		val := withdrawalAmount.Div(depositAmount)
 		val = val.Mul(rate)
 		data.DepositWithdrawalRate = val.StringFixed(4)
+		betAmount, _ := decimal.NewFromString(data.BetAmount)
+		data.Multiple = betAmount.Div(depositAmount).Mul(rate).StringFixed(4)
 	} else {
 		data.DepositWithdrawalRate = "0.0000"
+		data.Multiple = "0.0000"
 	}
 
 	val := depositAmount.Sub(withdrawalAmount)
@@ -485,8 +504,12 @@ func reportPlatItemFormat(data PlatReportItem) PlatReportItem {
 		val = val.Div(betAmount)
 		val = val.Mul(rate)
 		data.ProfitAmount = val.StringFixed(4)
+		companyRevenue, _ := decimal.NewFromString(data.CompanyRevenue)
+		data.KillRate = companyRevenue.Div(betAmount).Mul(rate).StringFixed(4)
+
 	} else {
 		data.ProfitAmount = "0.0000"
+		data.KillRate = "0.0000"
 	}
 
 	val, _ = decimal.NewFromString(data.FirstDepositAmount)
