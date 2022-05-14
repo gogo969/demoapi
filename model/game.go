@@ -50,8 +50,8 @@ type DetailReport struct {
 }
 
 type PlanIssues struct {
-	Id             int64   `json:"id" db:"id"`
-	PlanId         int64   `json:"plan_id" db:"plan_id"`
+	Id             string  `json:"id" db:"id"`
+	PlanId         string  `json:"plan_id" db:"plan_id"`
 	Issue          string  `json:"issue" db:"issue"`
 	Content        string  `json:"content" db:"content"`
 	BetMemCount    int     `json:"bet_mem_count" db:"bet_mem_count"`
@@ -60,7 +60,7 @@ type PlanIssues struct {
 }
 
 type GamePlanBase struct {
-	PlanId         int64   `json:"plan_id" db:"plan_id"`
+	PlanId         string  `json:"plan_id" db:"plan_id"`
 	BetMemCount    int     `json:"bet_mem_count" db:"bet_mem_count"`
 	BetAmountTotal float64 `json:"bet_amount_total" db:"bet_amount_total"`
 	BonusTotal     float64 `json:"bonus_total" db:"bonus_total"`
@@ -516,13 +516,13 @@ func GamePlanReport(id string, page, pageSize int) (PlanReportData, error) {
 	}
 	l := len(result.D)
 	if l > 0 {
-		var ids []int64
+		var ids []string
 		for _, v := range result.D {
 			ids = append(ids, v.Id)
 		}
 
 		var gpb []GamePlanBase
-		gpbMap := map[int64]GamePlanBase{}
+		gpbMap := map[string]GamePlanBase{}
 		exRp := g.Ex{
 			"plan_id": ids,
 			"prefix":  meta.Prefix,

@@ -130,7 +130,7 @@ type MemberData struct {
 // MemberReport 报表中心-会员报表
 func MemberReport(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, timeOutLogin, timeOutDeposit int,
 	sRegStartTime, sRegEndTime, sFdepositStartTime, sFdepositEndTime string, parentName, parentUid, userName string,
-	sStartTime, sEndTime, sCommissionId, sMainId string, ty int) (MemberReportData, error) {
+	sStartTime, sEndTime, sMainId string, ty int) (MemberReportData, error) {
 
 	var data MemberReportData
 	var regStartTime int64
@@ -184,7 +184,7 @@ func MemberReport(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, time
 		endTime = t
 	}
 	data, err := reportMemberData(flag, dateFlag, timeFlag, page, pageSize, timeOutBet, timeOutLogin, timeOutDeposit, FdepositStartTime, FdepositEndTime,
-		regStartTime, regEndTime, parentName, parentUid, userName, startTime, endTime, sCommissionId, sMainId, ty)
+		regStartTime, regEndTime, parentName, parentUid, userName, startTime, endTime, sMainId, ty)
 	if err != nil {
 		return MemberReportData{}, err
 	}
@@ -194,7 +194,7 @@ func MemberReport(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, time
 
 func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, timeOutLogin, timeOutDeposit int,
 	FdepositStartTime, FdepositEndTime, regStartTime, regEndTime int64, parentName, parentUid, userName string, startTime,
-	endTime int64, sCommissionId, sMainId string, ty int) (MemberReportData, error) {
+	endTime int64, sMainId string, ty int) (MemberReportData, error) {
 
 	data := MemberReportData{}
 	var list []MemberData
@@ -235,9 +235,6 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 
 	if parentName != "" && len(parentName) > 0 {
 		ex["parent_name"] = parentName
-	}
-	if sCommissionId != "" && len(sCommissionId) > 0 {
-		ex["comission_id"] = sCommissionId
 	}
 	if parentName == "" && userName != "" && len(userName) > 0 {
 		ex["username"] = userName
