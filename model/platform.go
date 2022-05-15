@@ -127,12 +127,14 @@ func PlatformReport(page, pageSize, flag, dateFlag, timeFlag int, depositStart, 
 	if startAt > endAt {
 		return data, errors.New(helper.QueryTimeRangeErr)
 	}
-
 	if len(depositStart) > 0 {
 		ex["deposit_amount"] = g.Op{"gte": depositStart}
 	}
 	if len(depositEnd) > 0 {
 		ex["deposit_amount"] = g.Op{"lte": depositEnd}
+	}
+	if len(depositStart) > 0 && len(depositEnd) > 0 {
+		ex["deposit_amount"] = g.Op{"between": exp.NewRangeVal(depositStart, depositEnd)}
 	}
 
 	if len(betAmountStart) > 0 {
@@ -140,6 +142,9 @@ func PlatformReport(page, pageSize, flag, dateFlag, timeFlag int, depositStart, 
 	}
 	if len(betAmountEnd) > 0 {
 		ex["bet_amount"] = g.Op{"lte": betAmountEnd}
+	}
+	if len(betAmountStart) > 0 && len(betAmountEnd) > 0 {
+		ex["bet_amount"] = g.Op{"between": exp.NewRangeVal(betAmountStart, betAmountEnd)}
 	}
 
 	if len(depositCountStart) > 0 {
@@ -149,11 +154,18 @@ func PlatformReport(page, pageSize, flag, dateFlag, timeFlag int, depositStart, 
 		ex["deposit_count"] = g.Op{"lte": depositCountEnd}
 	}
 
+	if len(depositCountStart) > 0 && len(depositCountEnd) > 0 {
+		ex["deposit_count"] = g.Op{"between": exp.NewRangeVal(depositCountStart, depositCountEnd)}
+	}
+
 	if len(netAmountStart) > 0 {
 		ex["company_net_amount"] = g.Op{"gte": netAmountStart}
 	}
 	if len(netAmountEnd) > 0 {
 		ex["company_net_amount"] = g.Op{"lte": netAmountEnd}
+	}
+	if len(netAmountStart) > 0 && len(netAmountEnd) > 0 {
+		ex["company_net_amount"] = g.Op{"between": exp.NewRangeVal(netAmountStart, netAmountEnd)}
 	}
 
 	tableName := "tbl_report_platform"
@@ -284,7 +296,7 @@ func platformReportSingleDay(startAt, endAt int64, page, pageSize int, tableName
 	col = append(col, g.C("report_time").As("report_time"))
 	query, _, _ := dialect.From(tableName).Select(col...).Where(ex).
 		GroupBy("report_time").Order(g.C("report_time").Desc()).Offset(uint(offset)).Limit(uint(pageSize)).ToSQL()
-
+	fmt.Println(query)
 	err := meta.ReportDB.Select(&data.D, query)
 	if err != nil {
 		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
