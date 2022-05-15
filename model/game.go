@@ -46,7 +46,7 @@ type DetailReport struct {
 	CompanyNetAmount float64 `json:"company_net_amount" db:"company_net_amount"`
 	RebateAmount     float64 `json:"rebate_amount" db:"rebate_amount"`
 	ProfitAmount     float64 `json:"profit_amount" db:"profit_amount"`
-	ProfitRate       float64 `json:"profit_rate" db:"profit_rate"`
+	ProfitRate       string  `json:"profit_rate" db:"profit_rate"`
 }
 
 type PlanIssues struct {
@@ -137,7 +137,7 @@ func GameDetailReport(flag int, startTime, endTime string, gameIds []string, pag
 	}
 	offset := (page - 1) * pageSize
 
-	buildCount := dialect.From(tableName).Select(g.COUNT("game_code")).Where(ex)
+	buildCount := dialect.From(tableName).Select(g.COUNT(g.DISTINCT("game_code"))).Where(ex)
 	query, _, _ := buildCount.ToSQL()
 	err := meta.ReportDB.Get(&result.T, query)
 	if err != nil {
@@ -155,9 +155,10 @@ func GameDetailReport(flag int, startTime, endTime string, gameIds []string, pag
 		g.SUM("rebate_amount").As("rebate_amount"),
 		g.SUM("profit_amount").As("profit_amount"),
 		g.SUM("profit_rate").As("profit_rate"),
-	).Order(g.C("report_time").Desc()).Offset(uint(offset)).Limit(uint(pageSize))
+	).Order(g.C("api_type").Desc()).Offset(uint(offset)).Limit(uint(pageSize))
 	query, _, _ = build.ToSQL()
 	err = meta.ReportDB.Select(&result.D, query)
+	fmt.Println(query)
 	if err != nil {
 		return result, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
 	}
@@ -175,7 +176,7 @@ func GameDetailReport(flag int, startTime, endTime string, gameIds []string, pag
 		}
 		v.ProfitAmount, _ = decimal.NewFromFloat(v.CompanyNetAmount).Sub(decimal.NewFromFloat(v.RebateAmount)).Float64()
 		if decimal.NewFromFloat(v.ValidBetAmount).Cmp(decimal.Zero) != 0 {
-			v.ProfitRate, _ = decimal.NewFromFloat(v.ProfitAmount).Div(decimal.NewFromFloat(v.ValidBetAmount)).Float64()
+			v.ProfitRate = decimal.NewFromFloat(v.ProfitAmount).Div(decimal.NewFromFloat(v.ValidBetAmount)).StringFixed(4)
 		}
 		result.D[i] = v
 	}

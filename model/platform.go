@@ -632,8 +632,8 @@ func ComplexReport(flag int, startDate, endDate string) (ComplexReportData, erro
 	data.UsdtAmount = fmt.Sprintf(`%f`, financeMap[10].DepositAmount)
 	data.UsdtCount = fmt.Sprintf(`%d`, financeMap[10].DepositNum)
 
-	data.ManualAmount = fmt.Sprintf(`%f`, financeMap[11].DepositAmount)
-	data.ManualCount = fmt.Sprintf(`%d`, financeMap[11].DepositNum)
+	data.ManualAmount = fmt.Sprintf(`%f`, financeMap[9].DepositAmount)
+	data.ManualCount = fmt.Sprintf(`%d`, financeMap[9].DepositNum)
 
 	return data, nil
 
