@@ -218,7 +218,7 @@ func gamePlatReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds 
 			g.SUM("avg_company_net_amount").As("avg_company_net_amount"),
 		).Order(g.C("report_time").Desc()).Offset(uint(offset)).Limit(uint(pageSize))
 
-		buildCount := dialect.From(tableName).Select(g.COUNT("api_type")).Where(ex)
+		buildCount := dialect.From(tableName).Select(g.COUNT(g.DISTINCT("api_type"))).Where(ex)
 		query, _, _ := buildCount.ToSQL()
 		err := meta.ReportDB.Get(&data.T, query)
 		if err != nil {
@@ -266,6 +266,11 @@ func gamePlatReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds 
 	}
 
 	data.D = reportGameFormat(data.D)
+	if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
+		for i := 0; i < len(data.D); i++ {
+			data.D[i].ReportTime = parsePart(startAt, endAt, "d")
+		}
+	}
 	return data, nil
 }
 
@@ -280,9 +285,9 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 
 	var data GameReportData
 	ex := g.Ex{
-		"bet_time": g.Op{"between": exp.NewRangeVal(startAt, endAt)},
-		"api_type": strings.Split(gameIds, ","),
-		"prefix":   meta.Prefix,
+		"report_time": g.Op{"between": exp.NewRangeVal(startAt, endAt)},
+		"api_type":    strings.Split(gameIds, ","),
+		"prefix":      meta.Prefix,
 	}
 
 	tableName := "tbl_report_game"
@@ -329,7 +334,7 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 			g.SUM("avg_company_net_amount").As("avg_company_net_amount"),
 		).GroupBy("api_type").Order(g.C("report_time").Desc()).Offset(uint(offset)).Limit(uint(pageSize))
 
-		buildCount := dialect.From(tableName).Select(g.COUNT("api_type")).Where(ex)
+		buildCount := dialect.From(tableName).Select(g.COUNT(g.DISTINCT("api_type"))).Where(ex)
 		query, _, _ := buildCount.ToSQL()
 		err := meta.ReportDB.Get(&data.T, query)
 		if err != nil {
@@ -339,7 +344,7 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 	}
 
 	query, _, _ := build.ToSQL()
-	err := meta.ReportDB.Select(&data, query)
+	err := meta.ReportDB.Select(&data.D, query)
 	if err != nil {
 		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
 	}
@@ -360,6 +365,11 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 	}
 
 	data.D = reportGameFormat(data.D)
+	if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
+		for i := 0; i < len(data.D); i++ {
+			data.D[i].ReportTime = parsePart(startAt, endAt, "d")
+		}
+	}
 	return data, nil
 }
 
@@ -422,8 +432,9 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 			g.SUM("profit_rate").As("profit_rate"),
 		).GroupBy("api_type").Order(g.C("report_time").Desc()).Offset(uint(offset)).Limit(uint(pageSize))
 
-		buildCount := dialect.From(tableName).Select(g.COUNT("api_type")).Where(ex)
+		buildCount := dialect.From(tableName).Select(g.COUNT(g.DISTINCT("api_type"))).Where(ex)
 		query, _, _ := buildCount.ToSQL()
+		fmt.Println(query)
 		err := meta.ReportDB.Get(&data.T, query)
 		if err != nil {
 			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
@@ -452,6 +463,12 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 	}
 
 	data.D = reportGameFormat(data.D)
+	if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
+
+		for i := 0; i < len(data.D); i++ {
+			data.D[i].ReportTime = parsePart(startAt, endAt, "d")
+		}
+	}
 	return data, nil
 }
 

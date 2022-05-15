@@ -7,6 +7,7 @@ import (
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/shopspring/decimal"
 	"reportapi/contrib/helper"
+	"time"
 )
 
 type PlatReportItem struct {
@@ -573,6 +574,9 @@ func ComplexReport(flag int, startDate, endDate string) (ComplexReportData, erro
 	}
 
 	if startAt > endAt {
+		return data, errors.New(helper.QueryTimeRangeErr)
+	}
+	if startAt > time.Now().Unix() {
 		return data, errors.New(helper.QueryTimeRangeErr)
 	}
 	ex["report_time"] = g.Op{"between": exp.NewRangeVal(startAt, endAt)}
