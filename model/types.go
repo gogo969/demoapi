@@ -25,7 +25,7 @@ const (
 )
 
 type Member struct {
-	Uid                int64   `json:"uid" db:"uid"`
+	Uid                string  `json:"uid" db:"uid"`
 	Username           string  `json:"username" db:"username"`
 	Password           string  `json:"password" db:"password"`
 	Prefix             string  `json:"prefix" db:"prefix"`

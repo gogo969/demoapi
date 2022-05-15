@@ -447,6 +447,7 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 	}
 
 	mbs, _ := MemberMCache(unames)
+
 	for k, v := range data.D {
 		// 获取会员代理信息
 		if mb, ok := mbs[v.Username]; ok {
@@ -457,8 +458,27 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			data.D[k].RegUrl = mb.RegUrl
 			data.D[k].Balance = strconv.FormatFloat(mb.Balance, 'f', -1, 64)
 			data.D[k].LastLoginAt = strconv.FormatInt(mb.LastLoginAt, 10)
+			// 获取用户标签
+			memberTag, err := MemberTagsList(mb.Uid)
+			if err != nil {
+				return data, err
+			}
+			data.D[k].TagNames = memberTag
 		}
 	}
 
 	return data, nil
+}
+
+func MemberTagsList(uid string) (string, error) {
+
+	var tags []string
+	ex := g.Ex{"uid": uid}
+	query, _, _ := dialect.From("tbl_member_tags").Select("tag_name").Where(ex).ToSQL()
+	err := meta.SlaveDB.Select(&tags, query)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.Join(tags, ","), nil
 }
