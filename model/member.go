@@ -330,7 +330,7 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 	}
 	build := dialect.From("tbl_report_agency").Where(ex)
 	offset := (page - 1) * pageSize
-	if timeFlag == ReportTimeFlagSingle {
+	if timeFlag == ReportTimeFlagSingle || ty == 1 {
 		build = build.Select(
 			g.C("report_time").As("report_time"),
 			g.C("uid").As("uid"),

@@ -603,7 +603,7 @@ func ComplexReport(flag int, startDate, endDate string) (ComplexReportData, erro
 
 	cm, _ := decimal.NewFromString(data.CompanyRevenue)
 	vb, _ := decimal.NewFromString(data.ValidBetAmount)
-	if vb.GreaterThanOrEqual(decimal.Zero) {
+	if vb.GreaterThan(decimal.Zero) {
 		data.WinRate = cm.Div(vb).StringFixed(3)
 	}
 
