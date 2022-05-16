@@ -464,10 +464,10 @@ func reportPlatItemFormat(data PlatReportItem) PlatReportItem {
 	rate := decimal.NewFromInt(100)
 
 	firstDepositCount, _ := decimal.NewFromString(data.FirstDepositCount)
-	depositCount, _ := decimal.NewFromString(data.DepositCount)
+	depositMemCount, _ := decimal.NewFromString(data.DepositMemCount)
 	registCount, _ := decimal.NewFromString(data.RegistCount)
 	if !registCount.Equal(min) {
-		val := depositCount.Div(registCount)
+		val := depositMemCount.Div(registCount)
 		val = val.Mul(rate)
 		data.ConversionRate = val.StringFixed(4)
 		data.FirstDepositConversionRate = firstDepositCount.Div(registCount).Mul(rate).StringFixed(4)
