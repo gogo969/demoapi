@@ -92,7 +92,11 @@ func parsePart(startTime, endTime int64, flag string) string {
 
 	result := ""
 	if flag == "m" {
-		result = fmt.Sprintf("%s ~ %s", ts.Format("2006-01"), te.Format("01"))
+		if endTime == 0 {
+			result = fmt.Sprintf("%s", ts.Format("2006-01"))
+		} else {
+			result = fmt.Sprintf("%s ~ %s", ts.Format("2006-01"), te.Format("01"))
+		}
 	}
 
 	if flag == "d" {

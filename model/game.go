@@ -269,7 +269,13 @@ func gamePlatReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds 
 	data.D = reportGameFormat(data.D)
 	if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
 		for i := 0; i < len(data.D); i++ {
-			data.D[i].ReportTime = parsePart(startAt, endAt, "d")
+			if flag == ReportFlagMonth && timeFlag == ReportTimeFlagSingle {
+				data.D[i].ReportTime = parsePart(startAt, 0, "m")
+			} else if flag == ReportFlagMonth && timeFlag == ReportTimeFlagPart {
+				data.D[i].ReportTime = parsePart(startAt, endAt, "m")
+			} else {
+				data.D[i].ReportTime = parsePart(startAt, endAt, "d")
+			}
 		}
 	}
 	return data, nil
@@ -368,7 +374,13 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 	data.D = reportGameFormat(data.D)
 	if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
 		for i := 0; i < len(data.D); i++ {
-			data.D[i].ReportTime = parsePart(startAt, endAt, "d")
+			if flag == ReportFlagMonth && timeFlag == ReportTimeFlagSingle {
+				data.D[i].ReportTime = parsePart(startAt, 0, "m")
+			} else if flag == ReportFlagMonth && timeFlag == ReportTimeFlagPart {
+				data.D[i].ReportTime = parsePart(startAt, endAt, "m")
+			} else {
+				data.D[i].ReportTime = parsePart(startAt, endAt, "d")
+			}
 		}
 	}
 	return data, nil
@@ -448,26 +460,35 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
 	}
 
-	aggQuery, _, _ := dialect.From(tableName).Select(g.SUM("mem_count").As("mem_count"),
-		g.SUM("bet_count").As("bet_count"),
-		g.SUM("bet_amount").As("bet_amount"),
-		g.SUM("valid_bet_amount").As("valid_bet_amount"),
-		g.SUM("company_net_amount").As("company_net_amount"),
-		g.SUM("presettle").As("presettle"),
-		g.SUM("avg_bet_amount").As("avg_bet_amount"),
-		g.SUM("avg_valid_bet_amount").As("avg_valid_bet_amount"),
-		g.SUM("profit_rate").As("profit_rate"),
-		g.SUM("avg_company_net_amount").As("avg_company_net_amount")).Where(ex).ToSQL()
-	err = meta.ReportDB.Get(&data.Agg, aggQuery)
-	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+	if data.T > 0 {
+		aggQuery, _, _ := dialect.From(tableName).Select(
+			g.SUM("mem_count").As("mem_count"),
+			g.SUM("bet_count").As("bet_count"),
+			g.SUM("bet_amount").As("bet_amount"),
+			g.SUM("valid_bet_amount").As("valid_bet_amount"),
+			g.SUM("company_net_amount").As("company_net_amount"),
+			g.SUM("presettle").As("presettle"),
+			g.SUM("avg_bet_amount").As("avg_bet_amount"),
+			g.SUM("avg_valid_bet_amount").As("avg_valid_bet_amount"),
+			g.SUM("profit_rate").As("profit_rate"),
+			g.SUM("avg_company_net_amount").As("avg_company_net_amount")).Where(ex).ToSQL()
+		fmt.Println(aggQuery)
+		err = meta.ReportDB.Get(&data.Agg, aggQuery)
+		if err != nil {
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		}
 	}
 
 	data.D = reportGameFormat(data.D)
 	if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
-
 		for i := 0; i < len(data.D); i++ {
-			data.D[i].ReportTime = parsePart(startAt, endAt, "d")
+			if flag == ReportFlagMonth && timeFlag == ReportTimeFlagSingle {
+				data.D[i].ReportTime = parsePart(startAt, 0, "m")
+			} else if flag == ReportFlagMonth && timeFlag == ReportTimeFlagPart {
+				data.D[i].ReportTime = parsePart(startAt, endAt, "m")
+			} else {
+				data.D[i].ReportTime = parsePart(startAt, endAt, "d")
+			}
 		}
 	}
 	return data, nil
