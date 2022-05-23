@@ -19,6 +19,7 @@ type Report struct {
 	MemCount            int    `db:"mem_count" json:"mem_count"`
 	BetCount            int    `db:"bet_count" json:"bet_count"`
 	BetAmount           string `db:"bet_amount" json:"bet_amount"`
+	RebateAmount        string `db:"rebate_amount" json:"rebate_amount"`
 	ValidBetAmount      string `db:"valid_bet_amount" json:"valid_bet_amount"`
 	CompanyNetAmount    string `db:"company_net_amount" json:"company_net_amount"`
 	AvgBetAmount        string `db:"avg_bet_amount" json:"avg_bet_amount"`
@@ -254,6 +255,7 @@ func gamePlatReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds 
 	aggQuery, _, _ := dialect.From(tableName).Select(g.SUM("mem_count").As("mem_count"),
 		g.SUM("bet_count").As("bet_count"),
 		g.SUM("bet_amount").As("bet_amount"),
+		g.SUM("rebate_amount").As("rebate_amount"),
 		g.SUM("valid_bet_amount").As("valid_bet_amount"),
 		g.SUM("company_net_amount").As("company_net_amount"),
 		g.SUM("presettle").As("presettle"),
@@ -331,6 +333,7 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 			g.SUM("mem_count").As("mem_count"),
 			g.SUM("bet_count").As("bet_count"),
 			g.SUM("bet_amount").As("bet_amount"),
+			g.SUM("rebate_amount").As("rebate_amount"),
 			g.SUM("valid_bet_amount").As("valid_bet_amount"),
 			g.SUM("company_net_amount").As("company_net_amount"),
 			g.SUM("presettle").As("presettle"),
@@ -359,6 +362,7 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 	aggQuery, _, _ := dialect.From(tableName).Select(g.SUM("mem_count").As("mem_count"),
 		g.SUM("bet_count").As("bet_count"),
 		g.SUM("bet_amount").As("bet_amount"),
+		g.SUM("rebate_amount").As("rebate_amount"),
 		g.SUM("valid_bet_amount").As("valid_bet_amount"),
 		g.SUM("company_net_amount").As("company_net_amount"),
 		g.SUM("presettle").As("presettle"),
@@ -436,6 +440,7 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 			g.SUM("mem_count").As("mem_count"),
 			g.SUM("bet_count").As("bet_count"),
 			g.SUM("bet_amount").As("bet_amount"),
+			g.SUM("rebate_amount").As("rebate_amount"),
 			g.SUM("valid_bet_amount").As("valid_bet_amount"),
 			g.SUM("company_net_amount").As("company_net_amount"),
 			g.SUM("avg_bet_amount").As("avg_bet_amount"),
@@ -465,6 +470,7 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 			g.SUM("mem_count").As("mem_count"),
 			g.SUM("bet_count").As("bet_count"),
 			g.SUM("bet_amount").As("bet_amount"),
+			g.SUM("rebate_amount").As("rebate_amount"),
 			g.SUM("valid_bet_amount").As("valid_bet_amount"),
 			g.SUM("company_net_amount").As("company_net_amount"),
 			g.SUM("presettle").As("presettle"),
