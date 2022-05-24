@@ -268,7 +268,7 @@ func GameDetailReport(flag int, startTime, endTime string, gameIds []string, pag
 		if v.ApiType == "2326854765648775667" {
 			v.ApiName = "AE_CP"
 		}
-		v.ProfitAmount, _ = decimal.NewFromFloat(v.CompanyNetAmount).Sub(decimal.NewFromFloat(v.RebateAmount)).Float64()
+		v.ProfitAmount, _ = decimal.NewFromFloat(v.CompanyNetAmount).Float64()
 		if decimal.NewFromFloat(v.ValidBetAmount).Cmp(decimal.Zero) != 0 {
 			v.ProfitRate = decimal.NewFromFloat(v.ProfitAmount).Div(decimal.NewFromFloat(v.ValidBetAmount)).StringFixed(4)
 		}
@@ -613,7 +613,7 @@ func reportGameUserFormat(data []ReportGameUserVo, id string) []ReportGameUserVo
 		RebateAmount, _ := decimal.NewFromString(v.RebateAmount)
 		data[k].RebateAmount = RebateAmount.StringFixed(4)
 
-		data[k].ProfitRate = (CompanyNetAmount.Add(Presettle).Sub(RebateAmount)).Div(ValidBetAmount).StringFixed(4)
+		data[k].ProfitRate = (CompanyNetAmount.Add(Presettle)).Div(ValidBetAmount).StringFixed(4)
 	}
 
 	return data
@@ -640,7 +640,7 @@ func reportGameFormat(data []Report) []Report {
 		RebateAmount, _ := decimal.NewFromString(v.RebateAmount)
 		data[k].Presettle = RebateAmount.StringFixed(4)
 
-		data[k].ProfitRate = (CompanyNetAmount.Add(Presettle).Sub(RebateAmount)).Div(ValidBetAmount).StringFixed(4)
+		data[k].ProfitRate = CompanyNetAmount.Add(Presettle).Div(ValidBetAmount).StringFixed(4)
 	}
 
 	return data
