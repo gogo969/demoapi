@@ -75,6 +75,8 @@ func SetupRouter(b BuildInfo) *fasthttprouter.Router {
 	// 报表中心-游戏报表
 	// 报表中心-游戏报表(场馆)
 	post("/merchant/report/game", gameCtl.List)
+	// 报表中心-游戏报表(场馆)
+	get("/merchant/report/game/detail", gameCtl.Detail)
 	// 报表中心-彩票报表
 	get("/merchant/report/game/cp", gameCtl.CpDetail)
 	// 报表中心-真人报表

@@ -29,6 +29,25 @@ type Report struct {
 	ProfitRate          string `db:"profit_rate" json:"profit_rate"`
 }
 
+type ReportGameUserVo struct {
+	ID               string `db:"id" json:"id"`
+	ApiType          string `db:"api_type" json:"api_type"`
+	Username         string `db:"username" json:"username"`
+	BetCount         int    `db:"bet_count" json:"bet_count"`
+	BetAmount        string `db:"bet_amount" json:"bet_amount"`
+	RebateAmount     string `db:"rebate_amount" json:"rebate_amount"`
+	ValidBetAmount   string `db:"valid_bet_amount" json:"valid_bet_amount"`
+	CompanyNetAmount string `db:"company_net_amount" json:"company_net_amount"`
+	Presettle        string `db:"presettle" json:"presettle"`
+	ProfitRate       string `db:"profit_rate" json:"profit_rate"`
+}
+
+type GameReportUserData struct {
+	D []ReportGameUserVo `json:"d"`
+	T int64              `json:"t"`
+	S int                `json:"s"`
+}
+
 type GameDetailReportData struct {
 	D []DetailReport `json:"d"`
 	T int64          `json:"t"`
@@ -109,6 +128,80 @@ func GameReport(ty, flag, dateFlag, timeFlag int, startTime, endTime, gameIds st
 	}
 
 	return result, nil
+}
+
+// GameReportUser 游戏报表
+func GameReportUser(ty, flag, dateFlag, timeFlag int, startTime, endTime, apiType string, page, pageSize int) (GameReportUserData, error) {
+
+	var data GameReportUserData
+
+	startAt := helper.DaySST(startTime, loc).Unix()
+
+	endAt := helper.DaySET(endTime, loc).Unix()
+
+	if startAt > endAt {
+		return data, errors.New(helper.QueryTimeRangeErr)
+	}
+	ex := g.Ex{
+		"report_time": g.Op{"between": exp.NewRangeVal(startAt, endAt)},
+		"api_type":    apiType,
+		"prefix":      meta.Prefix,
+	}
+	tableName := "tbl_report_game_user"
+	if ty == ReportTyGame && dateFlag == ReportDateFlagBet && flag == ReportFlagDay { // 游戏投注日报
+		ex["report_type"] = 1
+	}
+
+	if ty == ReportTyGame && dateFlag == ReportDateFlagSettle && flag == ReportFlagDay { // 游戏结算日报
+		ex["report_type"] = 2
+	}
+
+	if ty == ReportTyGame && dateFlag == ReportDateFlagBet && flag == ReportFlagMonth { // 游戏投注日报
+		ex["report_type"] = 3
+	}
+
+	if ty == ReportTyGame && dateFlag == ReportDateFlagSettle && flag == ReportFlagMonth { // 游戏结算日报
+		ex["report_type"] = 4
+	}
+
+	if ty == ReportTyPlat && flag == ReportFlagDay { // 场馆结算日报
+		ex["report_type"] = 5
+	}
+
+	if ty == ReportTyPlat && flag == ReportFlagMonth { // 场馆结算月报
+		ex["report_type"] = 6
+	}
+	offset := (page - 1) * pageSize
+	build := dialect.From(tableName).Where(ex)
+
+	build = build.GroupBy("username").Select(
+		"username",
+		g.SUM("bet_count").As("bet_count"),
+		g.SUM("bet_amount").As("bet_amount"),
+		g.SUM("valid_bet_amount").As("valid_bet_amount"),
+		g.SUM("company_net_amount").As("company_net_amount"),
+		g.SUM("presettle").As("presettle"),
+		g.SUM("profit_rate").As("profit_rate"),
+	).Order(g.C("report_time").Desc()).Offset(uint(offset)).Limit(uint(pageSize))
+
+	buildCount := dialect.From(tableName).Select(g.COUNT(g.DISTINCT("username"))).Where(ex)
+	query, _, _ := buildCount.ToSQL()
+	fmt.Println(query)
+	err := meta.ReportDB.Get(&data.T, query)
+	if err != nil {
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+	}
+
+	query, _, _ = build.ToSQL()
+	fmt.Println(query)
+	err = meta.ReportDB.Select(&data.D, query)
+	if err != nil {
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+	}
+
+	data.D = reportGameUserFormat(data.D, apiType)
+
+	return data, nil
 }
 
 // GameDetailReport 游戏子游戏报表
@@ -500,6 +593,32 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 	return data, nil
 }
 
+func reportGameUserFormat(data []ReportGameUserVo, id string) []ReportGameUserVo {
+
+	for k, v := range data {
+
+		data[k].ApiType = id
+		val, _ := decimal.NewFromString(v.BetAmount)
+		data[k].BetAmount = val.StringFixed(4)
+
+		ValidBetAmount, _ := decimal.NewFromString(v.ValidBetAmount)
+		data[k].ValidBetAmount = ValidBetAmount.StringFixed(4)
+
+		CompanyNetAmount, _ := decimal.NewFromString(v.CompanyNetAmount)
+		data[k].CompanyNetAmount = CompanyNetAmount.StringFixed(4)
+
+		Presettle, _ := decimal.NewFromString(v.Presettle)
+		data[k].Presettle = Presettle.StringFixed(4)
+
+		RebateAmount, _ := decimal.NewFromString(v.RebateAmount)
+		data[k].Presettle = RebateAmount.StringFixed(4)
+
+		data[k].ProfitRate = (CompanyNetAmount.Add(Presettle).Sub(RebateAmount)).Div(ValidBetAmount).StringFixed(4)
+	}
+
+	return data
+}
+
 func reportGameFormat(data []Report) []Report {
 
 	for k, v := range data {
@@ -509,17 +628,19 @@ func reportGameFormat(data []Report) []Report {
 		val, _ := decimal.NewFromString(v.BetAmount)
 		data[k].BetAmount = val.StringFixed(4)
 
-		val, _ = decimal.NewFromString(v.ValidBetAmount)
-		data[k].ValidBetAmount = val.StringFixed(4)
+		ValidBetAmount, _ := decimal.NewFromString(v.ValidBetAmount)
+		data[k].ValidBetAmount = ValidBetAmount.StringFixed(4)
 
-		val, _ = decimal.NewFromString(v.CompanyNetAmount)
-		data[k].CompanyNetAmount = val.StringFixed(4)
+		CompanyNetAmount, _ := decimal.NewFromString(v.CompanyNetAmount)
+		data[k].CompanyNetAmount = CompanyNetAmount.StringFixed(4)
 
-		val, _ = decimal.NewFromString(v.Presettle)
-		data[k].Presettle = val.StringFixed(4)
+		Presettle, _ := decimal.NewFromString(v.Presettle)
+		data[k].Presettle = Presettle.StringFixed(4)
 
-		val, _ = decimal.NewFromString(v.ProfitRate)
-		data[k].ProfitRate = val.StringFixed(4)
+		RebateAmount, _ := decimal.NewFromString(v.RebateAmount)
+		data[k].Presettle = RebateAmount.StringFixed(4)
+
+		data[k].ProfitRate = (CompanyNetAmount.Add(Presettle).Sub(RebateAmount)).Div(ValidBetAmount).StringFixed(4)
 	}
 
 	return data
