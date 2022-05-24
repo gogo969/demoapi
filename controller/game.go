@@ -51,7 +51,7 @@ func (that *GameController) Detail(ctx *fasthttp.RequestCtx) {
 	flag := ctx.QueryArgs().GetUintOrZero("flag")           //1-日报;2-月报
 	dateFlag := ctx.QueryArgs().GetUintOrZero("date_flag")  //1-投注时间;2-结算时间
 	timeFlag := ctx.QueryArgs().GetUintOrZero("time_flag")  //1-单天|单月,2-按时间段
-	id := string(ctx.QueryArgs().Peek("id"))                //游戏id
+	id := string(ctx.QueryArgs().Peek("api_type"))          //游戏id
 	startDate := string(ctx.QueryArgs().Peek("start_date")) //开始时间
 	endDate := string(ctx.QueryArgs().Peek("end_date"))     //结束时间
 	page := ctx.QueryArgs().GetUintOrZero("page")           //页码
