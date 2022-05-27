@@ -26,11 +26,11 @@ func (that MemberController) List(ctx *fasthttp.RequestCtx) {
 	sEndTime := string(ctx.QueryArgs().Peek("end_date"))                      // 结束时间
 	dateFlag := ctx.QueryArgs().GetUintOrZero("date_flag")                    // 1-投注时间;2-结算时间
 	timeFlag := ctx.QueryArgs().GetUintOrZero("time_flag")                    // 1-单天;2-时间段
-	sCommissionId := string(ctx.QueryArgs().Peek("commission_id"))            // 返佣方案
-	sMainId := string(ctx.QueryArgs().Peek("main_id"))                        // 维护人
-	page := ctx.QueryArgs().GetUintOrZero("page")                             //页码
-	pageSize := ctx.QueryArgs().GetUintOrZero("page_size")                    //一页多少条
-	ty := ctx.QueryArgs().GetUintOrZero("ty")                                 //1会员报表2代理报表
+	//sCommissionId := string(ctx.QueryArgs().Peek("commission_id"))            // 返佣方案
+	sMainId := string(ctx.QueryArgs().Peek("main_id"))     // 维护人
+	page := ctx.QueryArgs().GetUintOrZero("page")          //页码
+	pageSize := ctx.QueryArgs().GetUintOrZero("page_size") //一页多少条
+	ty := ctx.QueryArgs().GetUintOrZero("ty")              //1会员报表2代理报表
 
 	if page < 1 {
 		helper.Print(ctx, false, helper.ParamErr)
@@ -43,7 +43,7 @@ func (that MemberController) List(ctx *fasthttp.RequestCtx) {
 	}
 
 	data, err := model.MemberReport(flag, dateFlag, timeFlag, page, pageSize, timeOutBet, timeOutLogin, timeOutDeposit, sRegStartTime,
-		sRegEndTime, sFdepositStartTime, sFdepositEndTime, parentName, parentUid, userName, sStartTime, sEndTime, sCommissionId, sMainId, ty)
+		sRegEndTime, sFdepositStartTime, sFdepositEndTime, parentName, parentUid, userName, sStartTime, sEndTime, sMainId, ty)
 	if err != nil {
 		helper.Print(ctx, false, err.Error())
 		return

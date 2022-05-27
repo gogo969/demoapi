@@ -8,7 +8,7 @@ import (
 
 type PlatformController struct{}
 
-// Platform 报表中心-平台报表
+// List 报表中心-平台报表
 func (that PlatformController) List(ctx *fasthttp.RequestCtx) {
 
 	flag := ctx.PostArgs().GetUintOrZero("flag")          //1-日报;2-月报
@@ -34,6 +34,22 @@ func (that PlatformController) List(ctx *fasthttp.RequestCtx) {
 
 	data, err := model.PlatformReport(page, pageSize, flag, dateFlag, timeFlag, depositStart, depositEnd, betAmountStart,
 		betAmountEnd, depositCountStart, depositCountEnd, netAmountStart, netAmountEnd, startDate, endDate)
+	if err != nil {
+		helper.Print(ctx, false, err.Error())
+		return
+	}
+
+	helper.Print(ctx, true, data)
+}
+
+// Overview 报表中心 - 综合报表
+func (that PlatformController) Overview(ctx *fasthttp.RequestCtx) {
+
+	flag := ctx.QueryArgs().GetUintOrZero("flag")           //1-日报;2-月报
+	startDate := string(ctx.QueryArgs().Peek("start_date")) //开始时间
+	endDate := string(ctx.QueryArgs().Peek("end_date"))     //结束时间
+
+	data, err := model.ComplexReport(flag, startDate, endDate)
 	if err != nil {
 		helper.Print(ctx, false, err.Error())
 		return

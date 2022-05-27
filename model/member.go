@@ -38,6 +38,8 @@ type MemberReportItem struct {
 	ConversionRate        string `json:"conversion_rate" db:"conversion_rate"`
 	FirstDepositCount     string `json:"first_deposit_count" db:"first_deposit_count"`
 	FirstDepositAmount    string `json:"first_deposit_amount" db:"first_deposit_amount"`
+	SecondDepositCount    string `json:"second_deposit_count" db:"second_deposit_count"`
+	SecondDepositAmount   string `json:"second_deposit_amount" db:"second_deposit_amount"`
 	AvgFirstDepositAmount string `json:"avg_first_deposit_amount" db:"avg_first_deposit_amount"`
 	DepositMemCount       string `json:"deposit_mem_count" db:"deposit_mem_count"`
 	WithdrawalMemCount    string `json:"withdrawal_mem_count" db:"withdrawal_mem_count"`
@@ -94,6 +96,8 @@ type MemberData struct {
 	ConversionRate        string `json:"conversion_rate" db:"conversion_rate"`
 	FirstDepositCount     string `json:"first_deposit_count" db:"first_deposit_count"`
 	FirstDepositAmount    string `json:"first_deposit_amount" db:"first_deposit_amount"`
+	SecondDepositCount    string `json:"second_deposit_count" db:"second_deposit_count"`
+	SecondDepositAmount   string `json:"second_deposit_amount" db:"second_deposit_amount"`
 	AvgFirstDepositAmount string `json:"avg_first_deposit_amount" db:"avg_first_deposit_amount"`
 	DepositMemCount       string `json:"deposit_mem_count" db:"deposit_mem_count"`
 	WithdrawalMemCount    string `json:"withdrawal_mem_count" db:"withdrawal_mem_count"`
@@ -126,7 +130,7 @@ type MemberData struct {
 // MemberReport 报表中心-会员报表
 func MemberReport(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, timeOutLogin, timeOutDeposit int,
 	sRegStartTime, sRegEndTime, sFdepositStartTime, sFdepositEndTime string, parentName, parentUid, userName string,
-	sStartTime, sEndTime, sCommissionId, sMainId string, ty int) (MemberReportData, error) {
+	sStartTime, sEndTime, sMainId string, ty int) (MemberReportData, error) {
 
 	var data MemberReportData
 	var regStartTime int64
@@ -180,7 +184,7 @@ func MemberReport(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, time
 		endTime = t
 	}
 	data, err := reportMemberData(flag, dateFlag, timeFlag, page, pageSize, timeOutBet, timeOutLogin, timeOutDeposit, FdepositStartTime, FdepositEndTime,
-		regStartTime, regEndTime, parentName, parentUid, userName, startTime, endTime, sCommissionId, sMainId, ty)
+		regStartTime, regEndTime, parentName, parentUid, userName, startTime, endTime, sMainId, ty)
 	if err != nil {
 		return MemberReportData{}, err
 	}
@@ -190,7 +194,7 @@ func MemberReport(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, time
 
 func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, timeOutLogin, timeOutDeposit int,
 	FdepositStartTime, FdepositEndTime, regStartTime, regEndTime int64, parentName, parentUid, userName string, startTime,
-	endTime int64, sCommissionId, sMainId string, ty int) (MemberReportData, error) {
+	endTime int64, sMainId string, ty int) (MemberReportData, error) {
 
 	data := MemberReportData{}
 	var list []MemberData
@@ -232,11 +236,14 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 	if parentName != "" && len(parentName) > 0 {
 		ex["parent_name"] = parentName
 	}
-	if sCommissionId != "" && len(sCommissionId) > 0 {
-		ex["comission_id"] = sCommissionId
-	}
 	if parentName == "" && userName != "" && len(userName) > 0 {
 		ex["username"] = userName
+	}
+
+	if ty == 1 {
+		ex["data_type"] = 2
+	} else if userName != "" {
+		ex["data_type"] = 1
 	}
 
 	if page == 1 {
@@ -244,11 +251,6 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			var t []User
 			totalQuery, _, _ := dialect.From("tbl_report_agency").Select(g.C("uid").As("uid"),
 				g.V("0").As("report_time")).Where(ex).GroupBy("uid").ToSQL()
-			if ty == 1 {
-				totalQuery = strings.ReplaceAll(totalQuery, "WHERE", "WHERE uid=parent_uid and ")
-			} else if userName != "" {
-				totalQuery = strings.ReplaceAll(totalQuery, "WHERE", "WHERE uid!=parent_uid and ")
-			}
 			fmt.Println(totalQuery)
 			err := meta.ReportDB.Select(&t, totalQuery)
 			if err != nil {
@@ -262,11 +264,6 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			var t []User
 			totalQuery, _, _ := dialect.From("tbl_report_agency").Select(g.C("uid").As("uid"),
 				g.C("report_time").As("report_time")).Where(ex).ToSQL()
-			if ty == 1 {
-				totalQuery = strings.ReplaceAll(totalQuery, "WHERE", "WHERE uid=parent_uid and ")
-			} else if userName != "" {
-				totalQuery = strings.ReplaceAll(totalQuery, "WHERE", "WHERE uid!=parent_uid and ")
-			}
 			fmt.Println(totalQuery)
 			err := meta.ReportDB.Select(&t, totalQuery)
 			if err != nil {
@@ -289,6 +286,9 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			g.SUM("conversion_rate").As("conversion_rate"),
 			g.SUM("first_deposit_count").As("first_deposit_count"),
 			g.SUM("first_deposit_amount").As("first_deposit_amount"),
+			g.MAX("first_deposit_at").As("first_deposit_at"),
+			g.SUM("second_deposit_count").As("second_deposit_count"),
+			g.SUM("second_deposit_amount").As("second_deposit_amount"),
 			g.SUM("avg_first_deposit_amount").As("avg_first_deposit_amount"),
 			g.SUM("deposit_mem_count").As("deposit_mem_count"),
 			g.SUM("withdrawal_mem_count").As("withdrawal_mem_count"),
@@ -309,11 +309,6 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			g.SUM("company_revenue").As("company_revenue"),
 			g.SUM("deposit_count").As("deposit_count")).Where(ex).ToSQL()
 		err := meta.ReportDB.Get(&data.Agg, aggQuery)
-		if ty == 1 {
-			aggQuery = strings.ReplaceAll(aggQuery, "WHERE", "WHERE uid=parent_uid and ")
-		} else if userName != "" {
-			aggQuery = strings.ReplaceAll(aggQuery, "WHERE", "WHERE uid!=parent_uid and ")
-		}
 		if err != nil {
 			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), aggQuery), helper.DBErr)
 		}
@@ -336,55 +331,103 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 	}
 	build := dialect.From("tbl_report_agency").Where(ex)
 	offset := (page - 1) * pageSize
-	build = build.Select(
-		g.C("report_time").As("report_time"),
-		g.C("uid").As("uid"),
-		g.C("top_name").As("top_name"),
-		g.C("top_uid").As("top_uid"),
-		g.C("parent_name").As("parent_name"),
-		g.C("parent_uid").As("parent_uid"),
-		g.C("commissions_id").As("commissions_id"),
-		g.C("commission_name").As("commission_name"),
-		g.C("username").As("username"),
-		g.C("prefix").As("prefix"),
-		g.C("created_at").As("created_at"),
-		g.MAX("time_out_bet").As("time_out_bet"),
-		g.MAX("time_out_login").As("time_out_login"),
-		g.MAX("time_out_deposit").As("time_out_deposit"),
-		g.SUM("mem_count").As("mem_count"),
-		g.SUM("subordinate_count").As("subordinate_count"),
-		g.SUM("login_count").As("login_count"),
-		g.SUM("regist_count").As("regist_count"),
-		g.SUM("active_count").As("active_count"),
-		g.SUM("conversion_rate").As("conversion_rate"),
-		g.SUM("first_deposit_count").As("first_deposit_count"),
-		g.SUM("first_deposit_amount").As("first_deposit_amount"),
-		g.SUM("avg_first_deposit_amount").As("avg_first_deposit_amount"),
-		g.SUM("deposit_mem_count").As("deposit_mem_count"),
-		g.SUM("withdrawal_mem_count").As("withdrawal_mem_count"),
-		g.SUM("deposit_amount").As("deposit_amount"),
-		g.SUM("withdrawal_amount").As("withdrawal_amount"),
-		g.SUM("adjust_amount").As("adjust_amount"),
-		g.SUM("bet_mem_count").As("bet_mem_count"),
-		g.SUM("bet_amount").As("bet_amount"),
-		g.SUM("valid_bet_amount").As("valid_bet_amount"),
-		g.SUM("company_net_amount").As("company_net_amount"),
-		g.SUM("profit_amount").As("profit_amount"),
-		g.SUM("dividend_amount").As("dividend_amount"),
-		g.SUM("rebate_amount").As("rebate_amount"),
-		g.SUM("agent_amount").As("agent_amount"),
-		g.SUM("adjust_system_amount").As("adjust_system_amount"),
-		g.SUM("adjust_win_amount").As("adjust_win_amount"),
-		g.SUM("presettle").As("presettle"),
-		g.SUM("company_revenue").As("company_revenue"),
-		g.SUM("deposit_count").As("deposit_count"),
-	).GroupBy("uid", "username", "prefix", "parent_uid", "parent_name", "commissions_id", "commission_name", "report_time").Offset(uint(offset)).Limit(uint(pageSize))
+	if timeFlag == ReportTimeFlagSingle || ty == 1 {
+		build = build.Select(
+			g.C("report_time").As("report_time"),
+			g.C("uid").As("uid"),
+			g.C("top_name").As("top_name"),
+			g.C("top_uid").As("top_uid"),
+			g.C("parent_name").As("parent_name"),
+			g.C("parent_uid").As("parent_uid"),
+			g.C("commissions_id").As("commissions_id"),
+			g.C("commission_name").As("commission_name"),
+			g.C("username").As("username"),
+			g.C("prefix").As("prefix"),
+			g.C("created_at").As("created_at"),
+			g.MAX("time_out_bet").As("time_out_bet"),
+			g.MAX("time_out_login").As("time_out_login"),
+			g.MAX("time_out_deposit").As("time_out_deposit"),
+			g.SUM("mem_count").As("mem_count"),
+			g.SUM("subordinate_count").As("subordinate_count"),
+			g.SUM("login_count").As("login_count"),
+			g.SUM("regist_count").As("regist_count"),
+			g.SUM("active_count").As("active_count"),
+			g.SUM("conversion_rate").As("conversion_rate"),
+			g.SUM("first_deposit_count").As("first_deposit_count"),
+			g.SUM("first_deposit_amount").As("first_deposit_amount"),
+			g.MAX("first_deposit_at").As("first_deposit_at"),
+			g.SUM("second_deposit_count").As("second_deposit_count"),
+			g.SUM("second_deposit_amount").As("second_deposit_amount"),
+			g.SUM("avg_first_deposit_amount").As("avg_first_deposit_amount"),
+			g.SUM("deposit_mem_count").As("deposit_mem_count"),
+			g.SUM("withdrawal_mem_count").As("withdrawal_mem_count"),
+			g.SUM("deposit_amount").As("deposit_amount"),
+			g.SUM("withdrawal_amount").As("withdrawal_amount"),
+			g.SUM("adjust_amount").As("adjust_amount"),
+			g.SUM("bet_mem_count").As("bet_mem_count"),
+			g.SUM("bet_amount").As("bet_amount"),
+			g.SUM("valid_bet_amount").As("valid_bet_amount"),
+			g.SUM("company_net_amount").As("company_net_amount"),
+			g.SUM("profit_amount").As("profit_amount"),
+			g.SUM("dividend_amount").As("dividend_amount"),
+			g.SUM("rebate_amount").As("rebate_amount"),
+			g.SUM("agent_amount").As("agent_amount"),
+			g.SUM("adjust_system_amount").As("adjust_system_amount"),
+			g.SUM("adjust_win_amount").As("adjust_win_amount"),
+			g.SUM("presettle").As("presettle"),
+			g.SUM("company_revenue").As("company_revenue"),
+			g.SUM("deposit_count").As("deposit_count"),
+		).GroupBy("uid", "username", "prefix", "parent_uid", "parent_name", "commissions_id", "commission_name", "report_time").Offset(uint(offset)).Limit(uint(pageSize))
+	} else if timeFlag == ReportTimeFlagPart {
+		build = build.Select(
+			g.C("uid").As("uid"),
+			g.C("top_name").As("top_name"),
+			g.C("top_uid").As("top_uid"),
+			g.C("parent_name").As("parent_name"),
+			g.C("parent_uid").As("parent_uid"),
+			g.C("commissions_id").As("commissions_id"),
+			g.C("commission_name").As("commission_name"),
+			g.C("username").As("username"),
+			g.C("prefix").As("prefix"),
+			g.C("created_at").As("created_at"),
+			g.MAX("time_out_bet").As("time_out_bet"),
+			g.MAX("time_out_login").As("time_out_login"),
+			g.MAX("time_out_deposit").As("time_out_deposit"),
+			g.SUM("mem_count").As("mem_count"),
+			g.SUM("subordinate_count").As("subordinate_count"),
+			g.SUM("login_count").As("login_count"),
+			g.SUM("regist_count").As("regist_count"),
+			g.SUM("active_count").As("active_count"),
+			g.SUM("conversion_rate").As("conversion_rate"),
+			g.SUM("first_deposit_count").As("first_deposit_count"),
+			g.SUM("first_deposit_amount").As("first_deposit_amount"),
+			g.MAX("first_deposit_at").As("first_deposit_at"),
+			g.SUM("second_deposit_count").As("second_deposit_count"),
+			g.SUM("second_deposit_amount").As("second_deposit_amount"),
+			g.SUM("avg_first_deposit_amount").As("avg_first_deposit_amount"),
+			g.SUM("deposit_mem_count").As("deposit_mem_count"),
+			g.SUM("withdrawal_mem_count").As("withdrawal_mem_count"),
+			g.SUM("deposit_amount").As("deposit_amount"),
+			g.SUM("withdrawal_amount").As("withdrawal_amount"),
+			g.SUM("adjust_amount").As("adjust_amount"),
+			g.SUM("bet_mem_count").As("bet_mem_count"),
+			g.SUM("bet_amount").As("bet_amount"),
+			g.SUM("valid_bet_amount").As("valid_bet_amount"),
+			g.SUM("company_net_amount").As("company_net_amount"),
+			g.SUM("profit_amount").As("profit_amount"),
+			g.SUM("dividend_amount").As("dividend_amount"),
+			g.SUM("rebate_amount").As("rebate_amount"),
+			g.SUM("agent_amount").As("agent_amount"),
+			g.SUM("adjust_system_amount").As("adjust_system_amount"),
+			g.SUM("adjust_win_amount").As("adjust_win_amount"),
+			g.SUM("presettle").As("presettle"),
+			g.SUM("company_revenue").As("company_revenue"),
+			g.SUM("deposit_count").As("deposit_count"),
+		).GroupBy("uid", "username", "prefix", "parent_uid", "parent_name", "commissions_id", "commission_name").Offset(uint(offset)).Limit(uint(pageSize))
+	}
 	query, _, _ := build.ToSQL()
 	if ty == 1 {
-		query = strings.ReplaceAll(query, "WHERE", "WHERE uid=parent_uid and ")
 		query = strings.ReplaceAll(query, ", `report_time`", "")
-	} else if userName != "" {
-		query = strings.ReplaceAll(query, "WHERE", "WHERE uid!=parent_uid and ")
 	}
 	fmt.Println(query)
 	err := meta.ReportDB.Select(&list, query)
@@ -414,6 +457,8 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			ConversionRate:        v.ConversionRate,
 			FirstDepositCount:     v.FirstDepositCount,
 			FirstDepositAmount:    v.FirstDepositAmount,
+			SecondDepositCount:    v.SecondDepositCount,
+			SecondDepositAmount:   v.SecondDepositAmount,
 			AvgFirstDepositAmount: v.AvgFirstDepositAmount,
 			DepositMemCount:       v.DepositMemCount,
 			WithdrawalMemCount:    v.WithdrawalMemCount,
@@ -452,6 +497,7 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 	}
 
 	mbs, _ := MemberMCache(unames)
+
 	for k, v := range data.D {
 		// 获取会员代理信息
 		if mb, ok := mbs[v.Username]; ok {
@@ -462,8 +508,31 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			data.D[k].RegUrl = mb.RegUrl
 			data.D[k].Balance = strconv.FormatFloat(mb.Balance, 'f', -1, 64)
 			data.D[k].LastLoginAt = strconv.FormatInt(mb.LastLoginAt, 10)
+			// 获取用户标签
+			memberTag, err := MemberTagsList(mb.Uid)
+			if err != nil {
+				return data, err
+			}
+			data.D[k].TagNames = memberTag
+		}
+		if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
+			data.D[k].ReportTime = parsePart(startTime, endTime, "d")
+
 		}
 	}
 
 	return data, nil
+}
+
+func MemberTagsList(uid string) (string, error) {
+
+	var tags []string
+	ex := g.Ex{"uid": uid}
+	query, _, _ := dialect.From("tbl_member_tags").Select("tag_name").Where(ex).ToSQL()
+	err := meta.SlaveDB.Select(&tags, query)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.Join(tags, ","), nil
 }
