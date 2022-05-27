@@ -87,6 +87,7 @@ type ComplexReportData struct {
 	QrbankingAmount     string `db:"qrbanking_amount" json:"qrbanking_amount"`         //银行扫码金额
 	UsdtAmount          string `db:"usdt_amount" json:"usdt_amount"`                   //线下usdt金额
 	ManualAmount        string `db:"manual_amount" json:"manual_amount"`               //线下存款金额
+	PhoneAmount         string `db:"phone_amount" json:"phone_amount"`                 //刮刮卡金额
 	MomoCount           string `db:"momo_count" json:"momo_count"`                     //momo人数
 	ZaloCount           string `db:"zalo_count" json:"zalo_count"`                     //zalo人数
 	OnlineCount         string `db:"online_count" json:"online_count"`                 //银行直连人数
@@ -96,6 +97,8 @@ type ComplexReportData struct {
 	QrbankingCount      string `db:"qrbanking_count" json:"qrbanking_count"`           //银行扫码人数
 	UsdtCount           string `db:"usdt_count" json:"usdt_count"`                     //线下usdt人数
 	ManualCount         string `db:"manual_count" json:"manual_count"`                 //线下存款人数
+	PhoneCount          string `db:"phone_count" json:"phone_count"`                   //刮刮卡人数
+
 }
 
 type DepositsChannel struct {
@@ -646,6 +649,9 @@ func ComplexReport(flag int, startDate, endDate string) (ComplexReportData, erro
 
 	data.ManualAmount = fmt.Sprintf(`%f`, financeMap[9].DepositAmount)
 	data.ManualCount = fmt.Sprintf(`%d`, financeMap[9].DepositNum)
+
+	data.PhoneAmount = fmt.Sprintf(`%f`, financeMap[15].DepositAmount)
+	data.PhoneCount = fmt.Sprintf(`%d`, financeMap[15].DepositNum)
 
 	return data, nil
 
