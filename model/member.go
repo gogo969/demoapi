@@ -254,7 +254,7 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			fmt.Println(totalQuery)
 			err := meta.ReportDB.Select(&t, totalQuery)
 			if err != nil {
-				return data, pushLog(err, "db", DBErr)
+				return data, pushLog(err, helper.DBErr)
 			}
 			data.T = int64(len(t))
 			if data.T == 0 {
@@ -267,7 +267,7 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			fmt.Println(totalQuery)
 			err := meta.ReportDB.Select(&t, totalQuery)
 			if err != nil {
-				return data, pushLog(err, "db", DBErr)
+				return data, pushLog(err, helper.DBErr)
 			}
 			data.T = int64(len(t))
 			if data.T == 0 {
@@ -310,7 +310,7 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			g.SUM("deposit_count").As("deposit_count")).Where(ex).ToSQL()
 		err := meta.ReportDB.Get(&data.Agg, aggQuery)
 		if err != nil {
-			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), aggQuery), "db", helper.DBErr)
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), aggQuery), helper.DBErr)
 		}
 		cr, _ := decimal.NewFromString(data.Agg.RegistCount)
 		fdc, _ := decimal.NewFromString(data.Agg.FirstDepositCount)
@@ -432,7 +432,7 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 	fmt.Println(query)
 	err := meta.ReportDB.Select(&list, query)
 	if err != nil {
-		return data, pushLog(err, "db", DBErr)
+		return data, pushLog(err, helper.DBErr)
 	}
 	var (
 		uids   []interface{}

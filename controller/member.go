@@ -33,12 +33,12 @@ func (that MemberController) List(ctx *fasthttp.RequestCtx) {
 	ty := ctx.QueryArgs().GetUintOrZero("ty")              //1会员报表2代理报表
 
 	if page < 1 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 
 	if pageSize < 10 || pageSize > 200 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 

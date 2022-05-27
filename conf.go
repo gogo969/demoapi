@@ -40,6 +40,11 @@ type conf struct {
 		Username string   `json:"username"`
 		Password string   `json:"password"`
 	} `json:"report_es"`
+	Td struct {
+		Addr        string `json:"addr"`
+		MaxIdleConn int    `json:"max_idle_conn"`
+		MaxOpenConn int    `json:"max_open_conn"`
+	} `json:"td"`
 	Zlog struct {
 		Host string `json:"host"`
 		Port int    `json:"port"`

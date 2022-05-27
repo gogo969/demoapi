@@ -26,12 +26,12 @@ func (that *GameController) List(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	if page < 1 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 
 	if pageSize < 10 || pageSize > 200 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (that *GameController) Detail(ctx *fasthttp.RequestCtx) {
 	page := ctx.QueryArgs().GetUintOrZero("page")           //页码
 	pageSize := ctx.QueryArgs().GetUintOrZero("page_size")  //一页多少条
 	if page < 1 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 	if len(id) == 0 {
@@ -66,7 +66,7 @@ func (that *GameController) Detail(ctx *fasthttp.RequestCtx) {
 	}
 
 	if pageSize < 10 || pageSize > 200 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 
@@ -90,12 +90,12 @@ func (that *GameController) CpDetail(ctx *fasthttp.RequestCtx) {
 	pageSize := ctx.QueryArgs().GetUintOrZero("page_size")  //一页多少条
 
 	if page < 1 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 
 	if pageSize < 10 || pageSize > 200 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 
@@ -118,12 +118,12 @@ func (that *GameController) ZrDetail(ctx *fasthttp.RequestCtx) {
 	pageSize := ctx.QueryArgs().GetUintOrZero("page_size")  //一页多少条
 
 	if page < 1 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 
 	if pageSize < 10 || pageSize > 200 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 
@@ -145,12 +145,12 @@ func (that *GameController) Plan(ctx *fasthttp.RequestCtx) {
 	pageSize := ctx.QueryArgs().GetUintOrZero("page_size") //一页多少条
 
 	if page < 1 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 
 	if pageSize < 10 || pageSize > 200 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 

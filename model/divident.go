@@ -51,7 +51,7 @@ func DividendList(ex g.Ex, startTime, endTime string, page, pageSize int) (Divid
 		err := meta.ReportDB.Get(&data.T, countQuery)
 		if err != nil && err != sql.ErrNoRows {
 			fmt.Println(err, countQuery)
-			return data, pushLog(err, "db", helper.DBErr)
+			return data, pushLog(err, helper.DBErr)
 		}
 
 		if data.T == 0 {
@@ -64,7 +64,7 @@ func DividendList(ex g.Ex, startTime, endTime string, page, pageSize int) (Divid
 		Where(ex).Offset(uint(offset)).Limit(uint(pageSize)).Order(g.L("report_time").Desc()).ToSQL()
 	err := meta.ReportDB.Select(&data.D, dataQuery)
 	if err != nil {
-		return data, pushLog(err, "db", helper.DBErr)
+		return data, pushLog(err, helper.DBErr)
 	}
 
 	// 计算总计
@@ -72,7 +72,7 @@ func DividendList(ex g.Ex, startTime, endTime string, page, pageSize int) (Divid
 	err = meta.ReportDB.Get(&data.Amount, dataQuery)
 	if err != nil && err != sql.ErrNoRows {
 		fmt.Println(err, dataQuery)
-		return data, pushLog(err, "db", helper.DBErr)
+		return data, pushLog(err, helper.DBErr)
 	}
 
 	data.S = pageSize

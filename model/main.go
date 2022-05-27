@@ -7,30 +7,20 @@ import (
 	"fmt"
 	g "github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/mysql"
-	"github.com/fluent/fluent-logger-golang/fluent"
 	"github.com/go-redis/redis/v8"
 	"github.com/jmoiron/sqlx"
 	"github.com/olivere/elastic/v7"
 	"net/http"
 	"reflect"
 	"reportapi/contrib/helper"
-	"reportapi/contrib/tdlog"
-	"reportapi/contrib/tracerr"
+	"runtime"
+	"strings"
 	"time"
 )
 
-type log_t struct {
-	ID      string `json:"id" msg:"id"`
-	Project string `json:"project" msg:"project"`
-	Flags   string `json:"flags" msg:"flags"`
-	Fn      string `json:"fn" msg:"fn"`
-	File    string `json:"file" msg:"file"`
-	Content string `json:"content" msg:"content"`
-}
-
 type MetaTable struct {
-	Zlog          *fluent.Fluent
 	MerchantRedis *redis.Client
+	MerchantTD    *sqlx.DB
 	DorisDB       *sqlx.DB
 	PullDorisDB   *sqlx.DB
 	ReportDB      *sqlx.DB
@@ -39,6 +29,7 @@ type MetaTable struct {
 	Prefix        string
 	EsPrefix      string
 	PullPrefix    string
+	Program       string
 	Lang          string
 }
 
@@ -71,59 +62,39 @@ func Constructor(mt *MetaTable) {
 	}
 }
 
-func pushLog(err error, flag, code string) error {
+func pushLog(err error, code string) error {
 
-	err = tracerr.Wrap(err)
-	fields := map[string]string{
-		"filename": tracerr.SprintSource(err, 2, 2),
+	_, file, line, _ := runtime.Caller(1)
+	paths := strings.Split(file, "/")
+	l := len(paths)
+	if l > 2 {
+		file = paths[l-2] + "/" + paths[l-1]
+	}
+	path := fmt.Sprintf("%s:%d", file, line)
+
+	ts := time.Now()
+	id := helper.GenId()
+
+	fields := g.Record{
+		"id":       id,
 		"content":  err.Error(),
-		"fn":       code,
-		"id":       helper.GenId(),
-		"project":  "MerchantAdmin",
+		"project":  meta.Program,
+		"flags":    code,
+		"filename": path,
+		"ts":       ts.In(loc).UnixMilli(),
 	}
-	l := log_t{
-		ID:      helper.GenId(),
-		Project: "merchant",
-		Flags:   code,
-		Fn:      "",
-		File:    tracerr.SprintSource(err, 2, 2),
-		Content: err.Error(),
-	}
-	err = tdlog.Info(fields)
-	if err != nil {
-		fmt.Printf("write td[%#v] err : %s", fields, err.Error())
+	query, _, _ := dialect.Insert("goerror").Rows(&fields).ToSQL()
+	//fmt.Println(query)
+	_, err1 := meta.MerchantTD.Exec(query)
+	if err1 != nil {
+		fmt.Println("insert SMS = ", err1.Error(), fields)
 	}
 
-	_ = meta.Zlog.Post(esPrefixIndex("merchant_error"), l)
-	return fmt.Errorf("%s,%s", code, l.ID)
-}
-
-func esPrefixIndex(index string) string {
-	return meta.EsPrefix + index
-}
-
-func pushFlagLog(err error, flag string) error {
-
-	switch flag {
-	case "db":
-		return pushLog(err, flag, helper.ServerErr)
-	case "redis":
-		return pushLog(err, flag, helper.ServerErr)
-	case "es":
-		return pushLog(err, flag, helper.ServerErr)
-	case "amount":
-		return pushLog(err, flag, helper.AmountErr)
-	case "":
-	default:
-		return pushLog(err, flag, helper.ServerErr)
-	}
-
-	return err
+	note := fmt.Sprintf("Hệ thống lỗi %s", id)
+	return errors.New(note)
 }
 
 func Close() {
-
-	_ = meta.Zlog.Close()
 	_ = meta.DorisDB.Close()
 	_ = meta.PullDorisDB.Close()
 	_ = meta.ReportDB.Close()
@@ -171,7 +142,7 @@ func MemberMCache(names []string) (map[string]Member, error) {
 	data := map[string]Member{}
 
 	if len(names) == 0 {
-		return data, errors.New(ParamNull)
+		return data, errors.New(helper.ParamNull)
 	}
 
 	var mbs []Member
@@ -181,7 +152,7 @@ func MemberMCache(names []string) (map[string]Member, error) {
 	query, _, _ := dialect.From("tbl_members").Where(ex).Select(colsMember...).Limit(uint(len(names))).ToSQL()
 	err := meta.SlaveDB.Select(&mbs, query)
 	if err != nil && err != sql.ErrNoRows {
-		return data, pushFlagLog(err, "db")
+		return data, pushLog(err, helper.DBErr)
 	}
 
 	if len(mbs) > 0 {

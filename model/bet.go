@@ -89,7 +89,7 @@ func BetReport(gameType []string, startTime, endTime string, page, pageSize int)
 		totalQuery, _, _ := dialect.From("tbl_report_bet").Select(g.COUNT(1)).Where(ex).ToSQL()
 		err = meta.ReportDB.Get(&data.T, totalQuery)
 		if err != nil {
-			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), "db", helper.DBErr)
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), helper.DBErr)
 		}
 
 		if data.T == 0 {
@@ -103,7 +103,7 @@ func BetReport(gameType []string, startTime, endTime string, page, pageSize int)
 
 	err = meta.ReportDB.Select(&data.D, query)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	// 涨幅保留2位小数（涨幅50.76%数据库中保存的是0.5076所以需要保留4位小数）
