@@ -640,7 +640,11 @@ func reportGameFormat(data []Report) []Report {
 		RebateAmount, _ := decimal.NewFromString(v.RebateAmount)
 		data[k].Presettle = RebateAmount.StringFixed(4)
 
-		data[k].ProfitRate = CompanyNetAmount.Add(Presettle).Div(ValidBetAmount).StringFixed(4)
+		if ValidBetAmount.Cmp(decimal.Zero) == 1 {
+			data[k].ProfitRate = CompanyNetAmount.Add(Presettle).Div(ValidBetAmount).StringFixed(4)
+		} else {
+			data[k].ProfitRate = "0.0000"
+		}
 	}
 
 	return data
