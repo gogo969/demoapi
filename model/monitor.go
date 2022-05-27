@@ -126,7 +126,7 @@ func MonitorReport(page, pageSize int, date string) (MonitorReportData, error) {
 		totalQuery, _, _ := dialect.From("tbl_report_deposit_withdrawal").Select(g.COUNT(1)).Where(ex).ToSQL()
 		err := meta.ReportDB.Get(&data.T, totalQuery)
 		if err != nil {
-			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), "db", helper.DBErr)
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), helper.DBErr)
 		}
 
 		if data.T == 0 {
@@ -139,7 +139,7 @@ func MonitorReport(page, pageSize int, date string) (MonitorReportData, error) {
 		Where(ex).Offset(uint(offset)).Order(g.C("report_time").Desc()).Limit(uint(pageSize)).ToSQL()
 	err = meta.ReportDB.Select(&data.D, query)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	for k, v := range data.D {

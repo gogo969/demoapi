@@ -26,12 +26,12 @@ func (that *GameController) List(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	if page < 1 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 
 	if pageSize < 10 || pageSize > 200 {
-		helper.Print(ctx, false, model.ParamErr)
+		helper.Print(ctx, false, helper.ParamErr)
 		return
 	}
 

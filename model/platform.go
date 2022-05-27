@@ -186,7 +186,7 @@ func platformReportSingleDay(startAt, endAt int64, page, pageSize int, tableName
 			Select(g.C("report_time").As("report_time"), g.COUNT("id").As("count")).Where(ex).GroupBy("report_time").ToSQL()
 		err := meta.ReportDB.Select(&t, totalQuery)
 		if err != nil {
-			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), "db", helper.DBErr)
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), helper.DBErr)
 		}
 
 		data.T = int64(len(t))
@@ -203,14 +203,14 @@ func platformReportSingleDay(startAt, endAt int64, page, pageSize int, tableName
 
 	err := meta.ReportDB.Select(&data.D, query)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	col = platformReportCol()
 	aggQuery, _, _ := dialect.From(tableName).Select(col...).Where(ex).ToSQL()
 	err = meta.ReportDB.Get(&data.Agg, aggQuery)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	for k, v := range data.D {
@@ -233,7 +233,7 @@ func platformReportPeriodDay(startAt, endAt int64, page, pageSize int, tableName
 		Select(g.C("prefix").As("prefix"), g.COUNT("id").As("count")).Where(ex).GroupBy("prefix").ToSQL()
 	err := meta.ReportDB.Select(&t, totalQuery)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), helper.DBErr)
 	}
 
 	data.T = int64(len(t))
@@ -249,14 +249,14 @@ func platformReportPeriodDay(startAt, endAt int64, page, pageSize int, tableName
 
 	err = meta.ReportDB.Select(&data.D, query)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	col = platformReportCol()
 	agg, _, _ := dialect.From(tableName).Select(col...).Where(ex).ToSQL()
 	err = meta.ReportDB.Get(&data.Agg, agg)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	for k, v := range data.D {
@@ -279,7 +279,7 @@ func platformReportSingleMonth(startAt, endAt int64, page, pageSize int, tableNa
 		Select(g.C("report_month").As("report_time"), g.COUNT("id").As("count")).Where(ex).GroupBy("report_month").ToSQL()
 	err := meta.ReportDB.Select(&t, totalQuery)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), helper.DBErr)
 	}
 
 	data.T = int64(len(t))
@@ -295,14 +295,14 @@ func platformReportSingleMonth(startAt, endAt int64, page, pageSize int, tableNa
 
 	err = meta.ReportDB.Select(&data.D, query)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	col = platformReportCol()
 	agg, _, _ := dialect.From(tableName).Select(col...).Where(ex).ToSQL()
 	err = meta.ReportDB.Get(&data.Agg, agg)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	for k, v := range data.D {
@@ -325,7 +325,7 @@ func platformReportPeriodMonth(startAt, endAt int64, page, pageSize int, tableNa
 		Select(g.C("prefix").As("prefix"), g.COUNT("id").As("count")).Where(ex).GroupBy("prefix").ToSQL()
 	err := meta.ReportDB.Select(&t, totalQuery)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), totalQuery), helper.DBErr)
 	}
 
 	data.T = int64(len(t))
@@ -341,14 +341,14 @@ func platformReportPeriodMonth(startAt, endAt int64, page, pageSize int, tableNa
 
 	err = meta.ReportDB.Select(&data.D, query)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	col = platformReportCol()
 	agg, _, _ := dialect.From(tableName).Select(col...).Where(ex).ToSQL()
 	err = meta.ReportDB.Get(&data.Agg, agg)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	for k, v := range data.D {

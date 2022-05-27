@@ -104,7 +104,7 @@ func gamePlatReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds 
 		query, _, _ := buildCount.ToSQL()
 		err := meta.ReportDB.Get(&data.T, query)
 		if err != nil {
-			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 		}
 	}
 
@@ -118,7 +118,7 @@ func gamePlatReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds 
 		query, _, _ := buildCount.ToSQL()
 		err := meta.ReportDB.Select(&t, query)
 		if err != nil {
-			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 		}
 		data.T = int64(len(t))
 		if data.T == 0 {
@@ -129,7 +129,7 @@ func gamePlatReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds 
 	query, _, _ := build.ToSQL()
 	err := meta.ReportDB.Select(&data.D, query)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	aggQuery, _, _ := dialect.From(tableName).Select(g.SUM("mem_count").As("mem_count"),
@@ -144,7 +144,7 @@ func gamePlatReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds 
 		g.SUM("avg_company_net_amount").As("avg_company_net_amount")).Where(ex).ToSQL()
 	err = meta.ReportDB.Get(&data.Agg, aggQuery)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	data.D = reportGameFormat(data.D)
@@ -188,7 +188,7 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 		query, _, _ := buildCount.ToSQL()
 		err := meta.ReportDB.Select(&t, query)
 		if err != nil {
-			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 		}
 		data.T = int64(len(t))
 		if data.T == 0 {
@@ -215,7 +215,7 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 		query, _, _ := buildCount.ToSQL()
 		err := meta.ReportDB.Get(&data.T, query)
 		if err != nil {
-			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 		}
 
 	}
@@ -223,7 +223,7 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 	query, _, _ := build.ToSQL()
 	err := meta.ReportDB.Select(&data, query)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	aggQuery, _, _ := dialect.From(tableName).Select(g.SUM("mem_count").As("mem_count"),
@@ -238,7 +238,7 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 		g.SUM("avg_company_net_amount").As("avg_company_net_amount")).Where(ex).ToSQL()
 	err = meta.ReportDB.Get(&data.Agg, aggQuery)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	data.D = reportGameFormat(data.D)
@@ -280,7 +280,7 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 		query, _, _ := buildCount.ToSQL()
 		err := meta.ReportDB.Select(&t, query)
 		if err != nil {
-			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 		}
 		data.T = int64(len(t))
 		if data.T == 0 {
@@ -308,14 +308,14 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 		query, _, _ := buildCount.ToSQL()
 		err := meta.ReportDB.Get(&data.T, query)
 		if err != nil {
-			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 		}
 	}
 
 	query, _, _ := build.ToSQL()
 	err := meta.ReportDB.Select(&data.D, query)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	aggQuery, _, _ := dialect.From(tableName).Select(g.SUM("mem_count").As("mem_count"),
@@ -330,7 +330,7 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 		g.SUM("avg_company_net_amount").As("avg_company_net_amount")).Where(ex).ToSQL()
 	err = meta.ReportDB.Get(&data.Agg, aggQuery)
 	if err != nil {
-		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), "db", helper.DBErr)
+		return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
 	}
 
 	data.D = reportGameFormat(data.D)
