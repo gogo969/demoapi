@@ -515,9 +515,12 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			}
 			data.D[k].TagNames = memberTag
 		}
-		if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
+		if timeFlag == ReportTimeFlagPart {
 			data.D[k].ReportTime = parsePart(startTime, endTime, "d")
+		}
 
+		if flag == ReportFlagMonth && timeFlag == ReportTimeFlagPart {
+			data.D[k].ReportTime = parsePart(startTime, endTime, "m")
 		}
 	}
 
