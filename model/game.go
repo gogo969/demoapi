@@ -7,6 +7,7 @@ import (
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/shopspring/decimal"
 	"reportapi/contrib/helper"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -365,7 +366,8 @@ func gamePlatReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds 
 	if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
 		for i := 0; i < len(data.D); i++ {
 			if flag == ReportFlagMonth && timeFlag == ReportTimeFlagSingle {
-				data.D[i].ReportTime = parsePart(startAt, 0, "m")
+				rt, _ := strconv.ParseInt(data.D[i].ReportTime, 10, 64)
+				data.D[i].ReportTime = parsePart(rt, rt, "m")
 			} else if flag == ReportFlagMonth && timeFlag == ReportTimeFlagPart {
 				data.D[i].ReportTime = parsePart(startAt, endAt, "m")
 			} else {
@@ -474,7 +476,8 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 	if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
 		for i := 0; i < len(data.D); i++ {
 			if flag == ReportFlagMonth && timeFlag == ReportTimeFlagSingle {
-				data.D[i].ReportTime = parsePart(startAt, 0, "m")
+				rt, _ := strconv.ParseInt(data.D[i].ReportTime, 10, 64)
+				data.D[i].ReportTime = parsePart(rt, rt, "m")
 			} else if flag == ReportFlagMonth && timeFlag == ReportTimeFlagPart {
 				data.D[i].ReportTime = parsePart(startAt, endAt, "m")
 			} else {
@@ -587,7 +590,8 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 	if timeFlag == ReportTimeFlagPart || flag == ReportFlagMonth {
 		for i := 0; i < len(data.D); i++ {
 			if flag == ReportFlagMonth && timeFlag == ReportTimeFlagSingle {
-				data.D[i].ReportTime = parsePart(startAt, 0, "m")
+				rt, _ := strconv.ParseInt(data.D[i].ReportTime, 10, 64)
+				data.D[i].ReportTime = parsePart(rt, rt, "m")
 			} else if flag == ReportFlagMonth && timeFlag == ReportTimeFlagPart {
 				data.D[i].ReportTime = parsePart(startAt, endAt, "m")
 			} else {
