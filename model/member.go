@@ -487,6 +487,9 @@ func reportMemberData(flag, dateFlag, timeFlag, page, pageSize int, timeOutBet, 
 			Username:              v.Username,
 			TimeOutLogin:          v.TimeOutLogin,
 		}
+		if flag == ReportFlagMonth {
+			member.ReportTime = parseMonth(v.ReportTime)
+		}
 		if ty == 2 && parentName == member.Username {
 			member.ParentName = ""
 		}
