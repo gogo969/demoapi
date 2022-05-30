@@ -430,7 +430,6 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 			g.SUM("valid_bet_amount").As("valid_bet_amount"),
 			g.SUM("company_net_amount").As("company_net_amount"),
 			g.SUM("presettle").As("presettle"),
-			g.SUM("profit_amount").As("profit_amount"),
 			g.SUM("avg_bet_amount").As("avg_bet_amount"),
 			g.SUM("avg_valid_bet_amount").As("avg_valid_bet_amount"),
 			g.SUM("profit_rate").As("profit_rate"),
@@ -442,6 +441,9 @@ func gameReportBetTime(startAt, endAt int64, flag, timeFlag int, gameIds string,
 		err := meta.ReportDB.Get(&data.T, query)
 		if err != nil {
 			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
+		}
+		if data.T == 0 {
+			return data, nil
 		}
 
 	}
@@ -549,6 +551,9 @@ func gameReportSettleTime(startAt, endAt int64, flag, timeFlag int, gameIds stri
 		err := meta.ReportDB.Get(&data.T, query)
 		if err != nil {
 			return data, pushLog(fmt.Errorf("%s,[%s]", err.Error(), query), helper.DBErr)
+		}
+		if data.T == 0 {
+			return data, nil
 		}
 	}
 
