@@ -57,43 +57,12 @@ func SetupRouter(b BuildInfo) *fasthttprouter.Router {
 
 	buildInfo = b
 
-	memberCtl := new(controller.MemberController)
-	// 报表中心-游戏报表
-	gameCtl := new(controller.GameController)
-	// 报表中心-实时投注监控
-	betCtl := new(controller.BetController)
-	// 报表中心-实时存取监控
-	monitorCtl := new(controller.MonitorController)
-	// 报表中心-平台报表
-	platformCtl := new(controller.PlatformController)
-	// 报表中心-红利报表
-	dividendCtl := new(controller.DividendController)
+	// 日志服务
+	logCtl := new(controller.LogController)
 
-	get("/merchant/report/version", Version)
-	// 报表中心-实时投注监控
-	get("/merchant/report/bet", betCtl.List)
-	// 报表中心-游戏报表
-	// 报表中心-游戏报表(场馆)
-	post("/merchant/report/game", gameCtl.List)
-	// 报表中心-游戏报表(场馆)
-	get("/merchant/report/game/detail", gameCtl.Detail)
-	// 报表中心-彩票报表
-	get("/merchant/report/game/cp", gameCtl.CpDetail)
-	// 报表中心-真人报表
-	get("/merchant/report/game/zr", gameCtl.ZrDetail)
-	// 报表中心-计划报表
-	get("/merchant/report/game/plan", gameCtl.Plan)
-
-	// 报表中心-实时存取监控
-	post("/merchant/report/monitor", monitorCtl.List)
-	// 报表中心-平台报表
-	post("/merchant/report/platform", platformCtl.List)
-	// 报表中心-会员报表
-	get("/merchant/report/member", memberCtl.List)
-	// 报表中心-红利报表
-	get("/merchant/report/dividend", dividendCtl.List)
-	// 报表中心-综合报表
-	get("/merchant/report/overview", platformCtl.Overview)
+	get("/log/td/version", Version)
+	// 日志查询
+	get("/log/td/list", logCtl.List)
 	return router
 }
 

@@ -6,7 +6,6 @@ import (
 	"os"
 	"reportapi/contrib/apollo"
 	"reportapi/contrib/conn"
-	"reportapi/contrib/session"
 	"reportapi/middleware"
 	"reportapi/model"
 	"reportapi/router"
@@ -40,22 +39,12 @@ func main() {
 	mt := new(model.MetaTable)
 
 	mt.MerchantTD = conn.InitTD(cfg.Td.Addr, cfg.Td.MaxIdleConn, cfg.Td.MaxOpenConn)
-	mt.ReportDB = conn.InitDB(cfg.Db.Report.Addr, cfg.Db.Report.MaxIdleConn, cfg.Db.Report.MaxOpenConn)
-	mt.SlaveDB = conn.InitDB(cfg.Db.Slave.Addr, cfg.Db.Slave.MaxIdleConn, cfg.Db.Slave.MaxOpenConn)
-	mt.DorisDB = conn.InitDB(cfg.Db.Doris.Addr, cfg.Db.Doris.MaxIdleConn, cfg.Db.Doris.MaxOpenConn)
-	mt.PullDorisDB = conn.InitDB(cfg.Db.PullDoris.Addr, cfg.Db.PullDoris.MaxIdleConn, cfg.Db.PullDoris.MaxOpenConn)
-	mt.MerchantRedis = conn.InitRedisSentinel(cfg.Redis.Master.Addr, cfg.Redis.Master.Password, cfg.Redis.Master.Sentinel, cfg.Redis.Master.Db)
-
-	mt.Prefix = cfg.Prefix
-	mt.Lang = cfg.Lang
-	mt.EsPrefix = cfg.EsPrefix
-	mt.PullPrefix = cfg.PullPrefix
 
 	bin := strings.Split(os.Args[0], "/")
 	mt.Program = bin[len(bin)-1]
 
 	model.Constructor(mt)
-	session.New(mt.MerchantRedis, mt.Prefix)
+	//session.New(mt.MerchantRedis, mt.Prefix)
 
 	defer func() {
 		model.Close()
@@ -72,11 +61,11 @@ func main() {
 		Handler:            middleware.Use(app.Handler),
 		ReadTimeout:        router.ApiTimeout,
 		WriteTimeout:       router.ApiTimeout,
-		Name:               "reportApi",
+		Name:               "logApi",
 		MaxRequestBodySize: 51 * 1024 * 1024,
 	}
 	fmt.Printf("gitReversion = %s\r\nbuildGoVersion = %s\r\nbuildTime = %s\r\n", gitReversion, buildGoVersion, buildTime)
-	fmt.Println("report2 running", cfg.Port)
+	fmt.Println("logApi running", cfg.Port)
 	if err := srv.ListenAndServe(cfg.Port); err != nil {
 		log.Fatalf("Error in ListenAndServe: %s", err)
 	}
